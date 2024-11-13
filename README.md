@@ -16,7 +16,7 @@ This person will be responsible for setting the creative direction of the projec
 
 ## Tools and Materials
 
-### hat engines, libraries, frameworks, and platforms will be used?
+### What engines, libraries, frameworks, and platforms will be used?
 
 We plan to start with the Phaser.js v3.86.0 library in either the Node.js or Vite frameworks. The development will be handled in the Visual Studio Code IDE and the game will run in the browser so that it can easily transfer over to Mobile and PC platforms as well as various Operating System platforms. At the start, we will write the game code in TypeScript version 5.6 but later we will transition to JavaScript version ES2023 and/or Phaser.js v3.60.0.
 
