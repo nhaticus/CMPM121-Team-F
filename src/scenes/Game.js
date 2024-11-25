@@ -54,11 +54,30 @@ class Game extends Phaser.Scene {
     });
     
     /* day */
-    let day = 0;
+    this.day = 1;
+    this.showDay();
     
     /*  house */
     houseLayer.setTileIndexCallback(10, this.showPopup, this);
   }
+  
+  showDay() {
+    // If the text object already exists, update it
+    if (this.dayText) {
+      this.dayText.setText(`Day: ${this.day}`);
+    } else {
+      // Create the day text for the first time
+      this.dayText = this.add.text(10, 10, `Day: ${this.day}`, {
+        font: "18px Arial",
+        color: "#ffffff",
+        backgroundColor: "#000000",
+        padding: { x: 5, y: 5 }
+      }).setScrollFactor(0); // Fix the text to the camera view
+    }
+  }
+  
+  
+  
   showPopup(player, tile) {
     // Pause the game
     this.physics.pause();
@@ -86,16 +105,17 @@ class Game extends Phaser.Scene {
     ).setOrigin(0.5);
   
     // Create 'Yes' button
-    const yesButton = this.add.text(
-      centerX - 50,
-      centerY + 30,
-      "Yes",
-      { font: "18px Arial", color: "#00ff00", backgroundColor: "#000000", padding: { x: 10, y: 5 } }
-    )
+    const yesButton = this.add.text(centerX - 50, centerY + 30, "Yes", {
+      font: "18px Arial",
+      color: "#00ff00",
+      backgroundColor: "#000000",
+      padding: { x: 10, y: 5 },
+    })
       .setInteractive()
       .on("pointerdown", () => {
-        this.day = (this.day || 1) + 1; // Increment the day (initialize if NaN)
+        this.day++; // Increment the day
         console.log("Day: " + this.day); // Log the new day value
+        this.showDay(); // Update the day display text
         this.closePopup(overlay, popupText, yesButton, noButton);
       });
   
