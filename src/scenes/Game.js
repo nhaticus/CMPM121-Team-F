@@ -40,8 +40,90 @@ class Game extends Phaser.Scene {
 
     /*  controls  */
     this.cursors = this.input.keyboard.createCursorKeys();
+  
+    this.input.on('pointerdown', (pointer) => {
+      // Get the tile at the clicked position in the house layer
+      const tile = houseLayer.getTileAtWorldXY(pointer.worldX, pointer.worldY);
+      
+      if (tile) {
+        console.log("Clicked on the house layer! Tile index:", tile.index); // Debug: See which tile was clicked
+        this.showPopup(); // Show popup for any tile in the house layer
+      } else {
+        console.log("No tile found on the house layer at clicked position.");
+      }
+    });
+    
+    /* day */
+    let day = 0;
+    
+    /*  house */
+    houseLayer.setTileIndexCallback(10, this.showPopup, this);
+  }
+  showPopup(player, tile) {
+    // Pause the game
+    this.physics.pause();
+  
+    // Get the camera's center
+    const centerX = this.cameras.main.midPoint.x;
+    const centerY = this.cameras.main.midPoint.y;
+  
+    // Create a background overlay for the popup
+    const overlay = this.add.rectangle(
+      centerX,
+      centerY,
+      300,
+      200,
+      0x000000,
+      0.7
+    ).setOrigin(0.5);
+  
+    // Add text for the popup
+    const popupText = this.add.text(
+      centerX,
+      centerY - 50,
+      "Would you like to go to sleep?",
+      { font: "20px Arial", color: "#ffffff", align: "center" }
+    ).setOrigin(0.5);
+  
+    // Create 'Yes' button
+    const yesButton = this.add.text(
+      centerX - 50,
+      centerY + 30,
+      "Yes",
+      { font: "18px Arial", color: "#00ff00", backgroundColor: "#000000", padding: { x: 10, y: 5 } }
+    )
+      .setInteractive()
+      .on("pointerdown", () => {
+        this.day = (this.day || 1) + 1; // Increment the day (initialize if NaN)
+        console.log("Day: " + this.day); // Log the new day value
+        this.closePopup(overlay, popupText, yesButton, noButton);
+      });
+  
+    // Create 'No' button
+    const noButton = this.add.text(
+      centerX + 50,
+      centerY + 30,
+      "No",
+      { font: "18px Arial", color: "#ff0000", backgroundColor: "#000000", padding: { x: 10, y: 5 } }
+    )
+      .setInteractive()
+      .on("pointerdown", () => {
+        this.closePopup(overlay, popupText, yesButton, noButton);
+      });
   }
   
+
+  closePopup(overlay, popupText, yesButton, noButton) {
+    // Remove popup elements
+    overlay.destroy();
+    popupText.destroy();
+    yesButton.destroy();
+    noButton.destroy();
+
+    // Resume the game
+    this.physics.resume();
+  }
+    
   update() {
     this.player.update(this.cursors, this);
   }
