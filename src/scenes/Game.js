@@ -26,11 +26,15 @@ class Game extends Phaser.Scene {
     this.player = new Player(this, 50, 50, "player", 0);
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-    /*  collisions  */
-    waterLayer.setCollisionByProperty({ collides: true });
+    waterLayer.setCollisionByExclusion([-1]);
     this.physics.add.collider(this.player, waterLayer);
 
-    waterLayer.setCollisionBetween(0, 17);
+    houseLayer.setCollisionByExclusion([-1]);
+    this.physics.add.collider(this.player, houseLayer);
+
+    decorLayer.setCollisionByExclusion([-1]);
+    this.physics.add.collider(this.player, decorLayer);
+
 
 
     /*  camera  */
