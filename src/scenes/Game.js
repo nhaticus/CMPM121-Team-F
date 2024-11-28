@@ -4,9 +4,8 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    /*  map  */
+    /* map */
     const map = this.add.tilemap("mapJSON");
-
     const tiledGround = map.addTilesetImage("TiledGround", "tiledGroundTiles");
     const water = map.addTilesetImage("Water", "waterTiles");
     const decor = map.addTilesetImage("Decor", "decorTiles");
@@ -26,6 +25,12 @@ class Game extends Phaser.Scene {
     this.decorLayer = map.createLayer("Decor", [decor, fences, tree], 0, 0);
     this.waterLayer = map.createLayer("Water", water, 0, 0);
     this.tiledGroundLayer = map.createLayer("Tiled Ground", tiledGround, 0, 0);
+    /* layers */
+    const groundLayer = map.createLayer("Grass-n-Paths", [grass, farmTiles], 0, 0);
+    const houseLayer = map.createLayer("House", farmTiles, 0, 0);
+    const decorLayer = map.createLayer("Decor", [decor, fences, tree], 0, 0);
+    const waterLayer = map.createLayer("Water", water, 0, 0);
+    const tiledGroundLayer = map.createLayer("Tiled Ground", tiledGround, 0, 0);
 
     /*  player  */
     this.player = new Player(this, 500, 500, "player", 0);
@@ -74,7 +79,6 @@ class Game extends Phaser.Scene {
   }
 
   showDay() {
-    // If the text object already exists, update it
     if (this.dayText) {
       this.dayText.setText(`Day: ${this.day}`);
     } else {
@@ -122,9 +126,8 @@ class Game extends Phaser.Scene {
       })
       .setInteractive()
       .on("pointerdown", () => {
-        this.day++; // Increment the day
-        console.log("Day: " + this.day); // Log the new day value
-        this.showDay(); // Update the day display text
+        this.day++;
+        this.showDay();
         this.closePopup(overlay, popupText, yesButton, noButton);
       });
 
@@ -142,14 +145,55 @@ class Game extends Phaser.Scene {
       });
   }
 
-  closePopup(overlay, popupText, yesButton, noButton) {
-    // Remove popup elements
-    overlay.destroy();
-    popupText.destroy();
-    yesButton.destroy();
-    noButton.destroy();
+  showPlantInfoPopup() {
+    this.physics.pause();
+    const centerX = this.cameras.main.midPoint.x;
+    const centerY = this.cameras.main.midPoint.y;
 
-    // Resume the game
+    const overlay = this.add.rectangle(centerX, centerY, 300, 200, 0x000000, 0.7).setOrigin(0.5);
+    const popupText = this.add.text(
+      centerX,
+      centerY - 50,
+      "Days Planted:\nWatered:\nAdjacency Issues:\nPlant Level:",
+      { font: "20px Arial", color: "#ffffff", align: "center" }
+    ).setOrigin(0.5);
+
+    const harvestButton = this.add.text(centerX - 50, centerY + 20, "Harvest", {
+      font: "18px Arial",
+      color: "#ffffff",
+      backgroundColor: "#0000ff",
+      padding: { x: 10, y: 5 },
+    })
+      .setInteractive()
+      .on("pointerdown", () => {
+        // Placeholder for Harvest functionality
+      });
+
+    const waterButton = this.add.text(centerX + 50, centerY + 20, "Water", {
+      font: "18px Arial",
+      color: "#ffffff",
+      backgroundColor: "#00ff00",
+      padding: { x: 10, y: 5 },
+    })
+      .setInteractive()
+      .on("pointerdown", () => {
+        // Placeholder for Water functionality
+      });
+
+    const closeButton = this.add.text(centerX, centerY + 80, "Close", {
+      font: "18px Arial",
+      color: "#ff0000",
+      backgroundColor: "#000000",
+      padding: { x: 10, y: 5 },
+    })
+      .setInteractive()
+      .on("pointerdown", () => {
+        this.closePopup(overlay, popupText, harvestButton, waterButton, closeButton);
+      });
+  }
+
+  closePopup(...elements) {
+    elements.forEach((element) => element.destroy());
     this.physics.resume();
   }
 
