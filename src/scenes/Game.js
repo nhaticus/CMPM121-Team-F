@@ -26,7 +26,12 @@ class Game extends Phaser.Scene {
     this.waterLayer = map.createLayer("Water", water, 0, 0);
     this.tiledGroundLayer = map.createLayer("Tiled Ground", tiledGround, 0, 0);
     /* layers */
-    const groundLayer = map.createLayer("Grass-n-Paths", [grass, farmTiles], 0, 0);
+    const groundLayer = map.createLayer(
+      "Grass-n-Paths",
+      [grass, farmTiles],
+      0,
+      0
+    );
     const houseLayer = map.createLayer("House", farmTiles, 0, 0);
     const decorLayer = map.createLayer("Decor", [decor, fences, tree], 0, 0);
     const waterLayer = map.createLayer("Water", water, 0, 0);
@@ -150,45 +155,58 @@ class Game extends Phaser.Scene {
     const centerX = this.cameras.main.midPoint.x;
     const centerY = this.cameras.main.midPoint.y;
 
-    const overlay = this.add.rectangle(centerX, centerY, 300, 200, 0x000000, 0.7).setOrigin(0.5);
-    const popupText = this.add.text(
-      centerX,
-      centerY - 50,
-      "Days Planted:\nWatered:\nAdjacency Issues:\nPlant Level:",
-      { font: "20px Arial", color: "#ffffff", align: "center" }
-    ).setOrigin(0.5);
+    const overlay = this.add
+      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
+      .setOrigin(0.5);
+    const popupText = this.add
+      .text(
+        centerX,
+        centerY - 50,
+        "Days Planted:\nWatered:\nAdjacency Issues:\nPlant Level:",
+        { font: "20px Arial", color: "#ffffff", align: "center" }
+      )
+      .setOrigin(0.5);
 
-    const harvestButton = this.add.text(centerX - 50, centerY + 20, "Harvest", {
-      font: "18px Arial",
-      color: "#ffffff",
-      backgroundColor: "#0000ff",
-      padding: { x: 10, y: 5 },
-    })
+    const harvestButton = this.add
+      .text(centerX - 50, centerY + 20, "Harvest", {
+        font: "18px Arial",
+        color: "#ffffff",
+        backgroundColor: "#0000ff",
+        padding: { x: 10, y: 5 },
+      })
       .setInteractive()
       .on("pointerdown", () => {
         // Placeholder for Harvest functionality
       });
 
-    const waterButton = this.add.text(centerX + 50, centerY + 20, "Water", {
-      font: "18px Arial",
-      color: "#ffffff",
-      backgroundColor: "#00ff00",
-      padding: { x: 10, y: 5 },
-    })
+    const waterButton = this.add
+      .text(centerX + 50, centerY + 20, "Water", {
+        font: "18px Arial",
+        color: "#ffffff",
+        backgroundColor: "#00ff00",
+        padding: { x: 10, y: 5 },
+      })
       .setInteractive()
       .on("pointerdown", () => {
         // Placeholder for Water functionality
       });
 
-    const closeButton = this.add.text(centerX, centerY + 80, "Close", {
-      font: "18px Arial",
-      color: "#ff0000",
-      backgroundColor: "#000000",
-      padding: { x: 10, y: 5 },
-    })
+    const closeButton = this.add
+      .text(centerX, centerY + 80, "Close", {
+        font: "18px Arial",
+        color: "#ff0000",
+        backgroundColor: "#000000",
+        padding: { x: 10, y: 5 },
+      })
       .setInteractive()
       .on("pointerdown", () => {
-        this.closePopup(overlay, popupText, harvestButton, waterButton, closeButton);
+        this.closePopup(
+          overlay,
+          popupText,
+          harvestButton,
+          waterButton,
+          closeButton
+        );
       });
   }
 
@@ -196,25 +214,11 @@ class Game extends Phaser.Scene {
     elements.forEach((element) => element.destroy());
     this.physics.resume();
   }
-
   farmingUpdate() {
     const tile = this.tiledGroundLayer.getTileAtWorldXY(
       this.player.x,
       this.player.y
     );
-
-    const plantAtTile = this.plants.getChildren().find((plant) => {
-      const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
-        plant.x,
-        plant.y
-      );
-      return plantTile && plantTile.x === tile.x && plantTile.y === tile.y;
-    });
-
-    if (plantAtTile) {
-      console.log("There's a plant here already.");
-      return;
-    }
 
     if (
       tile &&
@@ -222,7 +226,10 @@ class Game extends Phaser.Scene {
         this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
       )
     ) {
-      console.log("its working");
+      if (this.plantCheck(tile)) {
+        console.log("There's a plant here already.");
+        return;
+      }
       const plant = new Plant(
         this,
         tile.getCenterX(),
@@ -231,6 +238,27 @@ class Game extends Phaser.Scene {
       );
       this.plants.add(plant);
       console.log(this.plants);
+    }
+  }
+
+  plantCheck(currentTile) {
+    const plantExist = this.plants.getChildren().find((plant) => {
+      const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
+        plant.x,
+        plant.y
+      );
+      return (
+        plantTile &&
+        plantTile.x === currentTile.x &&
+        plantTile.y === currentTile.y
+      );
+    });
+
+    if (plantExist) {
+      console.log("There's a plant here already.");
+      return true;
+    } else {
+      return false;
     }
   }
 

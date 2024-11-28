@@ -11,6 +11,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     const plantType = Phaser.Math.Between(1, 2);
     console.log("hello");
     this.level = 0;
+    this.days = 0;
 
     let frame;
 
