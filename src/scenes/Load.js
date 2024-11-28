@@ -21,6 +21,12 @@ class Load extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+
+    /*  plant assets  */
+    this.load.spritesheet("plant", "spritesheets/plant.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
   }
   create() {
     /* player's down animation */
