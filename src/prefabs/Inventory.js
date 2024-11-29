@@ -43,7 +43,7 @@ class Inventory extends Phaser.GameObjects.Sprite {
         this.on('pointerover', this.onOver, this);
         this.on('pointerout', this.onUp, this);
 
-
+        this.setDepth(10);
     }
 
     setContents(content){
