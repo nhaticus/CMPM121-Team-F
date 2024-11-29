@@ -47,6 +47,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.level++;
     this.setFrame(this.frame.name + 1);
     this.water = 0;
+    this.requirementsGenerator();
   }
 
   showPlantInfoPopup(scene) {
