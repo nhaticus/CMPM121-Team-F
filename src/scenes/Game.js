@@ -14,6 +14,7 @@ class Game extends Phaser.Scene {
     const farmTiles = map.addTilesetImage("FarmTiles", "farmTiles");
     const grass = map.addTilesetImage("Grass", "grassTiles");
 
+
     /*  layers  */
     this.groundLayer = map.createLayer(
       "Grass-n-Paths",
@@ -81,7 +82,113 @@ class Game extends Phaser.Scene {
 
     /*  house */
     this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
+
+
+    /* inventory */
+
+    let inventory = [];
+
+    const inventorybutton = new Inventory({
+      'scene': this,
+      'key': 'inventory',
+      'up': 0,
+      'down': 1,
+      'over': 1,
+      'x': 150,
+      'y': 280
+    });
+    inventorybutton.on('pointerdown', this.onPressed, this);
+
+    inventory.push(inventorybutton);
+
+    const inventorybutton2 = new Inventory({
+      'scene': this,
+      'key': 'inventory',
+      'up': 0,
+      'down': 1,
+      'over': 1,
+      'x': 182,
+      'y': 280
+    });
+    inventorybutton2.on('pointerdown', this.onPressed, this);
+
+    inventory.push(inventorybutton2);
+
+    const inventorybutton3 = new Inventory({
+      'scene': this,
+      'key': 'inventory',
+      'up': 0,
+      'down': 1,
+      'over': 1,
+      'x': 214,
+      'y': 280
+    });
+    inventorybutton3.on('pointerdown', this.onPressed, this);
+
+    inventory.push(inventorybutton3);
+
+    const inventorybutton4 = new Inventory({
+      'scene': this,
+      'key': 'inventory',
+      'up': 0,
+      'down': 1,
+      'over': 1,
+      'x': 246,
+      'y': 280
+    });
+    inventorybutton4.on('pointerdown', this.onPressed, this);
+
+    inventory.push(inventorybutton4);
+
+    const inventorybutton5 = new Inventory({
+      'scene': this,
+      'key': 'inventory',
+      'up': 0,
+      'down': 1,
+      'over': 1,
+      'x': 278,
+      'y': 280
+    });
+    inventorybutton5.on('pointerdown', this.onPressed, this);
+
+    inventory.push(inventorybutton5);
+
+    const inventorybutton6 = new Inventory({
+      'scene': this,
+      'key': 'inventory',
+      'up': 0,
+      'down': 1,
+      'over': 1,
+      'x': 310,
+      'y': 280,
+    });
+    inventorybutton6.on('pointerdown', this.onPressed, this);
+
+    inventory.push(inventorybutton6);
+
+    const inventorybutton7 = new Inventory({
+      'scene': this,
+      'key': 'inventory',
+      'up': 0,
+      'down': 1,
+      'over': 1,
+      'x': 342,
+      'y': 280
+    });
+    inventorybutton7.on('pointerdown', this.onPressed, this);
+
+    inventory.push(inventorybutton7);
+
+    inventory.forEach((slot) => console.log(slot.contents));
+
+
+
   }
+
+  onPressed(content){
+    console.log(this.contents);
+  }
+
 
   showDay() {
     if (this.dayText) {

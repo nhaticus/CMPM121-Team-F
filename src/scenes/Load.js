@@ -27,6 +27,12 @@ class Load extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
+
+    /* inventory assets */
+    this.load.spritesheet("inventory", "spritesheets/inventory.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    })
   }
   create() {
     /* player's down animation */
