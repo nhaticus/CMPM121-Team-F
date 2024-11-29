@@ -40,3 +40,10 @@ We think that switching platforms or languages mid-way through the project could
 
 By using Phaser as a game library, we are hoping to create something fun and unique as well a
 familiarize ourselves with the tool.
+
+# Devlog Entry - [11/29/2024]
+
+## How we Satisfied the Software Requirements
+
+
+## Reflection
