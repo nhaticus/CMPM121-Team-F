@@ -14,7 +14,6 @@ class Game extends Phaser.Scene {
     const farmTiles = map.addTilesetImage("FarmTiles", "farmTiles");
     const grass = map.addTilesetImage("Grass", "grassTiles");
 
-
     /*  layers  */
     this.groundLayer = map.createLayer(
       "Grass-n-Paths",
@@ -69,10 +68,10 @@ class Game extends Phaser.Scene {
       );
 
       if (tile) {
-        console.log("Clicked on the house layer! Tile index:", tile.index); // Debug: See which tile was clicked
+        //console.log("Clicked on the house layer! Tile index:", tile.index); // Debug: See which tile was clicked
         this.showPopup(); // Show popup for any tile in the house layer
       } else {
-        console.log("No tile found on the house layer at clicked position.");
+        //console.log("No tile found on the house layer at clicked position.");
       }
     });
 
@@ -83,112 +82,107 @@ class Game extends Phaser.Scene {
     /*  house */
     this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
 
-
     /* inventory */
 
     let inventory = [];
 
     const inventorybutton = new Inventory({
-      'scene': this,
-      'key': 'inventory',
-      'up': 0,
-      'down': 1,
-      'over': 1,
-      'x': 150,
-      'y': 280
+      scene: this,
+      key: "inventory",
+      up: 0,
+      down: 1,
+      over: 1,
+      x: 150,
+      y: 280,
     });
-    inventorybutton.on('pointerdown', this.onPressed, this);
+    inventorybutton.on("pointerdown", this.onPressed, this);
 
     inventory.push(inventorybutton);
 
     const inventorybutton2 = new Inventory({
-      'scene': this,
-      'key': 'inventory',
-      'up': 0,
-      'down': 1,
-      'over': 1,
-      'x': 182,
-      'y': 280
+      scene: this,
+      key: "inventory",
+      up: 0,
+      down: 1,
+      over: 1,
+      x: 182,
+      y: 280,
     });
-    inventorybutton2.on('pointerdown', this.onPressed, this);
+    inventorybutton2.on("pointerdown", this.onPressed, this);
 
     inventory.push(inventorybutton2);
 
     const inventorybutton3 = new Inventory({
-      'scene': this,
-      'key': 'inventory',
-      'up': 0,
-      'down': 1,
-      'over': 1,
-      'x': 214,
-      'y': 280
+      scene: this,
+      key: "inventory",
+      up: 0,
+      down: 1,
+      over: 1,
+      x: 214,
+      y: 280,
     });
-    inventorybutton3.on('pointerdown', this.onPressed, this);
+    inventorybutton3.on("pointerdown", this.onPressed, this);
 
     inventory.push(inventorybutton3);
 
     const inventorybutton4 = new Inventory({
-      'scene': this,
-      'key': 'inventory',
-      'up': 0,
-      'down': 1,
-      'over': 1,
-      'x': 246,
-      'y': 280
+      scene: this,
+      key: "inventory",
+      up: 0,
+      down: 1,
+      over: 1,
+      x: 246,
+      y: 280,
     });
-    inventorybutton4.on('pointerdown', this.onPressed, this);
+    inventorybutton4.on("pointerdown", this.onPressed, this);
 
     inventory.push(inventorybutton4);
 
     const inventorybutton5 = new Inventory({
-      'scene': this,
-      'key': 'inventory',
-      'up': 0,
-      'down': 1,
-      'over': 1,
-      'x': 278,
-      'y': 280
+      scene: this,
+      key: "inventory",
+      up: 0,
+      down: 1,
+      over: 1,
+      x: 278,
+      y: 280,
     });
-    inventorybutton5.on('pointerdown', this.onPressed, this);
+    inventorybutton5.on("pointerdown", this.onPressed, this);
 
     inventory.push(inventorybutton5);
 
     const inventorybutton6 = new Inventory({
-      'scene': this,
-      'key': 'inventory',
-      'up': 0,
-      'down': 1,
-      'over': 1,
-      'x': 310,
-      'y': 280,
+      scene: this,
+      key: "inventory",
+      up: 0,
+      down: 1,
+      over: 1,
+      x: 310,
+      y: 280,
     });
-    inventorybutton6.on('pointerdown', this.onPressed, this);
+    inventorybutton6.on("pointerdown", this.onPressed, this);
 
     inventory.push(inventorybutton6);
 
     const inventorybutton7 = new Inventory({
-      'scene': this,
-      'key': 'inventory',
-      'up': 0,
-      'down': 1,
-      'over': 1,
-      'x': 342,
-      'y': 280
+      scene: this,
+      key: "inventory",
+      up: 0,
+      down: 1,
+      over: 1,
+      x: 342,
+      y: 280,
     });
-    inventorybutton7.on('pointerdown', this.onPressed, this);
+    inventorybutton7.on("pointerdown", this.onPressed, this);
 
     inventory.push(inventorybutton7);
 
     inventory.forEach((slot) => console.log(slot.contents));
-
-
-
   }
 
-  onPressed(content){
-    console.log(this.contents);
+  onPressed(content) {
+    //console.log(this.contents);
   }
-
 
   showDay() {
     if (this.dayText) {
@@ -238,7 +232,7 @@ class Game extends Phaser.Scene {
       })
       .setInteractive()
       .on("pointerdown", () => {
-        this.day++;
+        this.newDay();
         this.showDay();
         this.closePopup(overlay, popupText, yesButton, noButton);
       });
@@ -261,6 +255,59 @@ class Game extends Phaser.Scene {
     elements.forEach((element) => element.destroy());
     this.physics.resume();
   }
+
+  newDay() {
+    this.day++;
+    const surroundingTiles = [
+      { x: -1, y: -1 },
+      { x: 0, y: -1 },
+      { x: 1, y: -1 },
+      { x: -1, y: 0 },
+      { x: 1, y: 0 },
+      { x: -1, y: 1 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+    ];
+    this.plants.getChildren().forEach((plant) => {
+      let surroundingPlants = 0;
+
+      surroundingTiles.forEach((offset) => {
+        const tile = this.tiledGroundLayer.getTileAtWorldXY(plant.x, plant.y);
+        tile.x += offset.x;
+        tile.y += offset.y;
+
+        if (tile && this.plantCheck(tile)) {
+          surroundingPlants++;
+        }
+      });
+
+      console.log(
+        `Plant at (${plant.x}, ${plant.y}) has ${surroundingPlants} surrounding plants.`
+      );
+      plant.newDay(surroundingPlants);
+    });
+  }
+
+  plantCheck(currentTile) {
+    return this.plants.getChildren().some((plant) => {
+      const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
+        plant.x,
+        plant.y
+      );
+
+      // console.log(
+      //   "Tile checking: " + currentTile.x,
+      //   currentTile.y + " Plant tile: " + plantTile.x,
+      //   plantTile.y
+      // );
+      return (
+        plantTile &&
+        plantTile.x === currentTile.x &&
+        plantTile.y === currentTile.y
+      );
+    });
+  }
+
   farmingUpdate() {
     const tile = this.tiledGroundLayer.getTileAtWorldXY(
       this.player.x,
@@ -274,7 +321,6 @@ class Game extends Phaser.Scene {
       )
     ) {
       if (this.plantCheck(tile)) {
-        console.log("There's a plant here already.");
         return;
       }
       const plant = new Plant(
@@ -283,35 +329,13 @@ class Game extends Phaser.Scene {
         tile.getCenterY(),
         "plant"
       );
-      plant.setInteractive().on('pointerdown', () => {
+      plant.setInteractive().on("pointerdown", () => {
         plant.showPlantInfoPopup(this);
       });
       this.plants.add(plant);
       console.log(this.plants);
     }
   }
-
-  plantCheck(currentTile) {
-    const plantExist = this.plants.getChildren().find((plant) => {
-      const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
-        plant.x,
-        plant.y
-      );
-      return (
-        plantTile &&
-        plantTile.x === currentTile.x &&
-        plantTile.y === currentTile.y
-      );
-    });
-
-    if (plantExist) {
-      console.log("There's a plant here already.");
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   update() {
     this.player.update(this.cursors, this);
 

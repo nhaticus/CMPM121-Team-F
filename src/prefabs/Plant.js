@@ -8,24 +8,45 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0.5);
 
     /* Randomize plant type */
-    const plantType = Phaser.Math.Between(1, 3);
-
-    let frame = (plantType - 1) * 6 + 1;
-
-    this.setFrame(frame);
+    this.setPlantType(Phaser.Math.Between(1, 3));
 
     /* Some global variables */
     this.plantType = "";
+    this.neightbor = 0;
     this.water = 0;
     this.sun = 0;
     this.days = 0;
     this.level = 0;
+
     this.requirements = "";
+
+    this.requirementsGenerator();
+  }
+
+  setPlantType(x) {
+    switch (x) {
+      case 1:
+        this.plantType = "corn";
+        this.setFrame(1);
+        break;
+      case 2:
+        this.plantType = "eggplant";
+        this.setFrame(7);
+        break;
+      case 3:
+        this.plantType = "tomato";
+        this.setFrame(13);
+        break;
+    }
   }
 
   grow() {
+    if (this.level === 3) {
+      return;
+    }
     this.level++;
     this.setFrame(this.frame.name + 1);
+    this.water = 0;
   }
 
   showPlantInfoPopup(scene) {
@@ -129,5 +150,32 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   closePopup(...elements) {
     elements.forEach((element) => element.destroy());
     this.physics.resume();
+  }
+
+  requirementsGenerator() {
+    this.waterReq = Phaser.Math.Between(5, 20) * 5;
+    this.neighborReq = Phaser.Math.Between(8, 8);
+
+    this.requirements = `Water: ${this.waterReq}%, Surrounding Plants: ${this.neighborReq}`;
+  }
+
+  newDay(x) {
+    this.days++;
+    this.neighbor = x;
+    this.levelUp(); // Check if plant can level up
+    if (this.water >= 5) {
+      this.water -= 5;
+    }
+  }
+
+  levelUp() {
+    const hasRequiredNeighbors = this.neighborReq === this.neighbor;
+    const hasRequiredWater = this.water === this.waterReq;
+    const canLevelUp = this.level < 3;
+
+    console.log(hasRequiredNeighbors, hasRequiredWater, canLevelUp);
+    if (hasRequiredNeighbors && hasRequiredWater && canLevelUp) {
+      this.grow();
+    }
   }
 }
