@@ -257,66 +257,6 @@ class Game extends Phaser.Scene {
       });
   }
 
-  showPlantInfoPopup() {
-    this.physics.pause();
-    const centerX = this.cameras.main.midPoint.x;
-    const centerY = this.cameras.main.midPoint.y;
-
-    const overlay = this.add
-      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
-      .setOrigin(0.5);
-    const popupText = this.add
-      .text(
-        centerX,
-        centerY - 50,
-        "Days Planted:\nWatered:\nAdjacency Issues:\nPlant Level:",
-        { font: "20px Arial", color: "#ffffff", align: "center" }
-      )
-      .setOrigin(0.5);
-
-    const harvestButton = this.add
-      .text(centerX - 50, centerY + 20, "Harvest", {
-        font: "18px Arial",
-        color: "#ffffff",
-        backgroundColor: "#0000ff",
-        padding: { x: 10, y: 5 },
-      })
-      .setInteractive()
-      .on("pointerdown", () => {
-        // Placeholder for Harvest functionality
-      });
-
-    const waterButton = this.add
-      .text(centerX + 50, centerY + 20, "Water", {
-        font: "18px Arial",
-        color: "#ffffff",
-        backgroundColor: "#00ff00",
-        padding: { x: 10, y: 5 },
-      })
-      .setInteractive()
-      .on("pointerdown", () => {
-        // Placeholder for Water functionality
-      });
-
-    const closeButton = this.add
-      .text(centerX, centerY + 80, "Close", {
-        font: "18px Arial",
-        color: "#ff0000",
-        backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
-      })
-      .setInteractive()
-      .on("pointerdown", () => {
-        this.closePopup(
-          overlay,
-          popupText,
-          harvestButton,
-          waterButton,
-          closeButton
-        );
-      });
-  }
-
   closePopup(...elements) {
     elements.forEach((element) => element.destroy());
     this.physics.resume();
@@ -343,6 +283,9 @@ class Game extends Phaser.Scene {
         tile.getCenterY(),
         "plant"
       );
+      plant.setInteractive().on('pointerdown', () => {
+        plant.showPlantInfoPopup(this);
+      });
       this.plants.add(plant);
       console.log(this.plants);
     }
