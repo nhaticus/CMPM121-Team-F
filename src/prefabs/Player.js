@@ -10,6 +10,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.setCollideWorldBounds(true);
 
+    this.setDepth(10);
+
     playerDirection = "down";
     speed = 100;
   }
