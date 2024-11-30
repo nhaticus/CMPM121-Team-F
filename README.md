@@ -44,7 +44,28 @@ familiarize ourselves with the tool.
 # Devlog Entry - [11/29/2024]
 
 ## How we Satisfied the Software Requirements
+# F0.a You control a character moving over a 2D grid.
+....
 
+# F0.b You advance time manually in the turn-based simulation.
+We advance the time by allowing the character to click on a house and go to sleep. When you choose to sleep, the Day value goes up by one so we advance through time by Days.
+
+# F0.c You can reap or sow plants on grid cells only when you are near them.
+When you click on a plant a popup will show the plants stats and give you the option to harvest or water it.
+... (HOW DID YOU IMPLEMENT THE PLANTING PART) ...
+
+# F0.d Grid cells have sun and water levels. The incoming sun and water for each cell is somehow randomly generated each turn. Sun energy cannot be stored in a cell (it is used immediately or lost) while water moisture can be slowly accumulated over several turns.
+...
+
+# F0.e Each plant on the grid has a distinct type (e.g. one of 3 species) and a growth level (e.g. “level 1”, “level 2”, “level 3”).
+We found some plant assets of three different plants all at different stages of growth to visually show the different levels. 
+
+# F0.f Simple spatial rules govern plant growth based on sun, water, and nearby plants (growth is unlocked by satisfying conditions).
+When you click on the plant you can see the stats of the plant (sun, water, and nearby plants). 
+If these conditions are satisfied... (WHAT HAPPENS WHEN CONDITIONS ARE SATISFIED)
+
+# F0.g A play scenario is completed when some condition is satisfied (e.g. at least X plants at growth level Y or above).
+...
 
 ## Reflection
 We thought a lot in advance about making this assignment as easy as possible to manipulate given the changing requirements. It's a big reason we went with JavaScript and Phaser. We implemented Tiled into the idea because it came with a built in grid system for us to just borrow from, however at first we had forgotten how to use Tiled. It took a while to get into the swing of things again but I don't think we need to change anything. 
