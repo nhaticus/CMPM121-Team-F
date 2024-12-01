@@ -44,30 +44,38 @@ familiarize ourselves with the tool.
 # Devlog Entry - [11/29/2024]
 
 ## How we Satisfied the Software Requirements
+
 # F0.a You control a character moving over a 2D grid.
-....
+
+We implemented a playable character that the player can control using WASD on the keyboard. The playable character has idle and moving animation for each directional idle and movement. Alongside that, there is also a 2D grid map of a farm with a plot of land the player can plant stuff.
 
 # F0.b You advance time manually in the turn-based simulation.
+
 We advance the time by allowing the character to click on a house and go to sleep. When you choose to sleep, the Day value goes up by one so we advance through time by Days.
 
 # F0.c You can reap or sow plants on grid cells only when you are near them.
-When you click on a plant a popup will show the plants stats and give you the option to harvest or water it.
-... (HOW DID YOU IMPLEMENT THE PLANTING PART) ...
+
+The player is able to plant the seed when they are hovering over a tile that the player is standing and it doesn't already have a plant there. For the time being, the plants are randomly picked (from 3 choices: corn, eggplant, tomato) upon the player pressing "E".When you click on a plant a popup will show the plants stats and give you the option to harvest or water it.
 
 # F0.d Grid cells have sun and water levels. The incoming sun and water for each cell is somehow randomly generated each turn. Sun energy cannot be stored in a cell (it is used immediately or lost) while water moisture can be slowly accumulated over several turns.
-...
+
+The water level thta the plant requires to level up is randomized between 25 and 100 with each day the water level will decrease by 5. The player can water each plants and increasing the water level up by 25 every time.
 
 # F0.e Each plant on the grid has a distinct type (e.g. one of 3 species) and a growth level (e.g. “level 1”, “level 2”, “level 3”).
-We found some plant assets of three different plants all at different stages of growth to visually show the different levels. 
+
+We found some plant assets of three different plants all at different stages of growth to visually show the different levels.
 
 # F0.f Simple spatial rules govern plant growth based on sun, water, and nearby plants (growth is unlocked by satisfying conditions).
-When you click on the plant you can see the stats of the plant (sun, water, and nearby plants). 
-If these conditions are satisfied... (WHAT HAPPENS WHEN CONDITIONS ARE SATISFIED)
+
+When you click on the plant you can see the stats of the plant (sun, water, and nearby plants).
+If these conditions are satisfied the plant will level/grow the next day/turn. The plant matures and is able to harvest at level 3.
 
 # F0.g A play scenario is completed when some condition is satisfied (e.g. at least X plants at growth level Y or above).
-...
+
+For now we have implemented so that if the player is able to grow a plant to max level and harvest it, they have achieved the goal of the game. Hopefully soon, we want to be able to get our inventory system to a functioning state and the player get to pick and choose what they want to plant and we will change the requirements for leveling to be more plant specific.
 
 ## Reflection
-We thought a lot in advance about making this assignment as easy as possible to manipulate given the changing requirements. It's a big reason we went with JavaScript and Phaser. We implemented Tiled into the idea because it came with a built in grid system for us to just borrow from, however at first we had forgotten how to use Tiled. It took a while to get into the swing of things again but I don't think we need to change anything. 
+
+We thought a lot in advance about making this assignment as easy as possible to manipulate given the changing requirements. It's a big reason we went with JavaScript and Phaser. We implemented Tiled into the idea because it came with a built in grid system for us to just borrow from, however at first we had forgotten how to use Tiled. It took a while to get into the swing of things again but I don't think we need to change anything.
 If we were to change something I would say that the assets we used in Tiled are so pretty and detailed that I think it made us focus on things that we really didn't need to focus on immediately. For example, we have a functional walking and idle animation working which was something we didn't need for the requirements but it was something we got distracted by because it was there. I think if we were going to change something it would be our scope so that we hone in more on what's required rather than additional features.
 I also think we should change up how tasks are divided. Sometimes we will pick tasks at random only to find out that one of us can't do any of our tasks right away because our task depends on someone else in the group completing their task first. We should think through how we organize our team effort a little more, but as for the environment and tools we're working with, we have gotten a lot more comfortable with them now.
