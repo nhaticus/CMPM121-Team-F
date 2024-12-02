@@ -178,6 +178,31 @@ class Game extends Phaser.Scene {
     inventory.push(inventorybutton7);
 
     inventory.forEach((slot) => console.log(slot.contents));
+  
+     /* undo & redo buttons */
+      // Add Undo Button
+      const undoButton = this.add
+      .image(this.cameras.main.width - 100, 50, 'UndoButton')
+      .setOrigin(0.5)
+      .setScrollFactor(0) // Fixes button to the camera
+      .setInteractive()
+      .setDisplaySize(32, 32)
+      .on('pointerdown', () => {
+        console.log('Undo button clicked');
+        // Add functionality for undo action here
+      });
+
+    // Add Redo Button
+    const redoButton = this.add
+      .image(this.cameras.main.width - 50, 50, 'RedoButton')
+      .setOrigin(0.5)
+      .setScrollFactor(0) // Fixes button to the camera
+      .setInteractive()
+      .setDisplaySize(32, 32)
+      .on('pointerdown', () => {
+        console.log('Redo button clicked');
+        // Add functionality for redo action here
+      });
   }
 
   onPressed(content) {

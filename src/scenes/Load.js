@@ -14,6 +14,10 @@ class Load extends Phaser.Scene {
     this.load.image("treeTiles", "tilesets/Tree.png");
     this.load.image("waterTiles", "tilesets/Water.png");
 
+     /* button assets */
+     this.load.image('UndoButton', 'tilesets/UndoButton.png');
+     this.load.image('RedoButton', 'tilesets/RedoButton.png');
+
     this.load.tilemapTiledJSON("mapJSON", "map.json");
 
     /*  player assets  */
