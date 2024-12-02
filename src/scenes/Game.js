@@ -258,6 +258,10 @@ class Game extends Phaser.Scene {
 
   newDay() {
     this.day++;
+    this.checkPlantReq();
+  }
+
+  checkPlantReq() {
     const surroundingTiles = [
       { x: -1, y: -1 },
       { x: 0, y: -1 },
@@ -284,6 +288,8 @@ class Game extends Phaser.Scene {
       console.log(
         `Plant at (${plant.x}, ${plant.y}) has ${surroundingPlants} surrounding plants.`
       );
+
+      /* calls a function that will check if the surrounding plants matches with required plants */
       plant.newDay(surroundingPlants);
     });
   }
