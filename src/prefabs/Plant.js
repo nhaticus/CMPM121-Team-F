@@ -17,6 +17,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.sun = 0;
     this.days = 0;
     this.level = 0;
+    this.sun = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
 
     this.requirements = "";
 
@@ -54,34 +55,42 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     scene.physics.pause();
     const centerX = scene.cameras.main.midPoint.x;
     const centerY = scene.cameras.main.midPoint.y;
-
+  
+    const popupWidth = 300;
+    const popupHeight = 200;
+  
     const overlay = scene.add
-      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
+      .rectangle(centerX, centerY, popupWidth, popupHeight, 0x000000, 0.7)
       .setOrigin(0.5)
       .setDepth(2);
+  
     const popupText = scene.add
       .text(
         centerX,
-        centerY - 50,
+        centerY - popupHeight / 2 + 20, // Position text at the top of the popup
         "Days Planted: " +
           this.days +
           "\nWater Level: " +
           this.water +
+          "%\nCurrent Sunlight: " +
+          this.sun +
           "%\nRequirements: " +
           this.requirements +
           "\nPlant Level: " +
           this.level,
-        { font: "20px Arial", color: "#ffffff", align: "center" }
+        { font: "16px Arial", color: "#ffffff", align: "center", wordWrap: { width: popupWidth - 20 } }
       )
       .setOrigin(0.5)
       .setDepth(2);
-
+  
+    const buttonYOffset = popupHeight / 2 - 40;
+  
     const harvestButton = scene.add
-      .text(centerX - 50, centerY + 20, "Harvest", {
-        font: "18px Arial",
+      .text(centerX - 80, centerY + buttonYOffset, "Harvest", {
+        font: "14px Arial",
         color: "#ffffff",
         backgroundColor: "#00ff00",
-        padding: { x: 10, y: 5 },
+        padding: { x: 8, y: 4 },
       })
       .setInteractive()
       .setOrigin(0.5)
@@ -98,13 +107,13 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
           );
         }
       });
-
+  
     const waterButton = scene.add
-      .text(centerX + 50, centerY + 20, "Water", {
-        font: "18px Arial",
+      .text(centerX + 80, centerY + buttonYOffset, "Water", {
+        font: "14px Arial",
         color: "#ffffff",
         backgroundColor: "#0000ff",
-        padding: { x: 10, y: 5 },
+        padding: { x: 8, y: 4 },
       })
       .setInteractive()
       .setOrigin(0.5)
@@ -115,24 +124,27 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
         } else {
           this.water += 25;
         }
-        popupText.text =
+        popupText.setText(
           "Days Planted: " +
-          this.days +
-          "\nWater Level: " +
-          this.water +
-          "%\nRequirements: " +
-          this.requirements +
-          "\nPlant Level: " +
-          this.level;
+            this.days +
+            "\nWater Level: " +
+            this.water +
+            "%\nCurrent Sunlight: " +
+            this.sun +
+            "%\nRequirements: " +
+            this.requirements +
+            "\nPlant Level: " +
+            this.level
+        );
         console.log(this.water);
       });
-
+  
     const closeButton = scene.add
-      .text(centerX, centerY + 80, "Close", {
-        font: "18px Arial",
+      .text(centerX, centerY + popupHeight / 2 - 20, "Close", {
+        font: "14px Arial",
         color: "#ff0000",
         backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
+        padding: { x: 8, y: 4 },
       })
       .setOrigin(0.5)
       .setInteractive()
@@ -147,6 +159,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
         );
       });
   }
+  
 
   closePopup(...elements) {
     elements.forEach((element) => element.destroy());
@@ -156,8 +169,9 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   requirementsGenerator() {
     this.waterReq = Phaser.Math.Between(5, 20) * 5;
     this.neighborReq = Phaser.Math.Between(8, 8);
+    this.sunReq = Phaser.Math.Between(5, 20) * 5;
 
-    this.requirements = `Water: ${this.waterReq}%, Surrounding Plants: ${this.neighborReq}`;
+    this.requirements = `\nWater: ${this.waterReq}% \nSurrounding Plants: ${this.neighborReq} \n Sunlight: ${this.sunReq}`;
   }
 
   newDay(x) {
