@@ -178,10 +178,10 @@ class Game extends Phaser.Scene {
     inventory.push(inventorybutton7);
 
     inventory.forEach((slot) => console.log(slot.contents));
-  
-     /* undo & redo buttons */
-      // Add Undo Button
-      const undoButton = this.add
+
+    /* undo & redo buttons */
+    // Add Undo Button
+    const undoButton = this.add
       .image(this.cameras.main.width - 100, 50, 'UndoButton')
       .setOrigin(0.5)
       .setScrollFactor(0) // Fixes button to the camera
@@ -301,18 +301,19 @@ class Game extends Phaser.Scene {
       let surroundingPlants = 0;
 
       surroundingTiles.forEach((offset) => {
-        const tile = this.tiledGroundLayer.getTileAtWorldXY(plant.x, plant.y);
-        tile.x += offset.x;
-        tile.y += offset.y;
+        const tileX = plant.x + offset.x * 16;
+        const tileY = plant.y + offset.y * 16;
+        const tile = this.tiledGroundLayer.getTileAtWorldXY(tileX, tileY);
 
-        if (tile && this.plantCheck(tile)) {
-          surroundingPlants++;
+        // console.log(`Checking tile at (${tileX}, ${tileY})`);
+
+        if (tile) {
+          // console.log(`Tile found at (${tileX}, ${tileY})`);
+          if (this.plantCheck(tile)) {
+            surroundingPlants++;
+          }
         }
       });
-
-      console.log(
-        `Plant at (${plant.x}, ${plant.y}) has ${surroundingPlants} surrounding plants.`
-      );
 
       /* calls a function that will check if the surrounding plants matches with required plants */
       plant.newDay(surroundingPlants);
@@ -326,11 +327,6 @@ class Game extends Phaser.Scene {
         plant.y
       );
 
-      // console.log(
-      //   "Tile checking: " + currentTile.x,
-      //   currentTile.y + " Plant tile: " + plantTile.x,
-      //   plantTile.y
-      // );
       return (
         plantTile &&
         plantTile.x === currentTile.x &&
@@ -364,7 +360,6 @@ class Game extends Phaser.Scene {
         plant.showPlantInfoPopup(this);
       });
       this.plants.add(plant);
-      console.log(this.plants);
     }
   }
   update() {

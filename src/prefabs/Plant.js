@@ -55,15 +55,15 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     scene.physics.pause();
     const centerX = scene.cameras.main.midPoint.x;
     const centerY = scene.cameras.main.midPoint.y;
-  
+
     const popupWidth = 300;
     const popupHeight = 200;
-  
+
     const overlay = scene.add
       .rectangle(centerX, centerY, popupWidth, popupHeight, 0x000000, 0.7)
       .setOrigin(0.5)
       .setDepth(2);
-  
+
     const popupText = scene.add
       .text(
         centerX,
@@ -78,13 +78,18 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
           this.requirements +
           "\nPlant Level: " +
           this.level,
-        { font: "16px Arial", color: "#ffffff", align: "center", wordWrap: { width: popupWidth - 20 } }
+        {
+          font: "16px Arial",
+          color: "#ffffff",
+          align: "center",
+          wordWrap: { width: popupWidth - 20 },
+        }
       )
       .setOrigin(0.5)
       .setDepth(2);
-  
+
     const buttonYOffset = popupHeight / 2 - 40;
-  
+
     const harvestButton = scene.add
       .text(centerX - 80, centerY + buttonYOffset, "Harvest", {
         font: "14px Arial",
@@ -107,7 +112,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
           );
         }
       });
-  
+
     const waterButton = scene.add
       .text(centerX + 80, centerY + buttonYOffset, "Water", {
         font: "14px Arial",
@@ -136,9 +141,8 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
             "\nPlant Level: " +
             this.level
         );
-        console.log(this.water);
       });
-  
+
     const closeButton = scene.add
       .text(centerX, centerY + popupHeight / 2 - 20, "Close", {
         font: "14px Arial",
@@ -159,7 +163,6 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
         );
       });
   }
-  
 
   closePopup(...elements) {
     elements.forEach((element) => element.destroy());
@@ -168,7 +171,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
 
   requirementsGenerator() {
     this.waterReq = Phaser.Math.Between(5, 20) * 5;
-    this.neighborReq = Phaser.Math.Between(8, 8);
+    this.neighborReq = Phaser.Math.Between(2, 8);
     this.sunReq = Phaser.Math.Between(5, 20) * 5;
 
     this.requirements = `\nWater: ${this.waterReq}% \nSurrounding Plants: ${this.neighborReq} \n Sunlight: ${this.sunReq}`;
