@@ -24,14 +24,32 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.requirementsGenerator();
   }
 
+  /*  WHEAT SPRITESHEET INDEXES
+      0 - Seed
+      1-3 - Plants
+      4 - Produce
+  */
+
+  /*  PLUM SPRITESHEET INDEXES
+      5 - Seed
+      6-8 - Plants
+      9 - Produce
+  */
+
+  /*  TOMATO SPRITESHEET INDEXES
+      10 - Seed
+      11-13 - Plants
+      14 - Produce
+  */
+
   setPlantType(x) {
     switch (x) {
       case 1:
-        this.plantType = "corn";
+        this.plantType = "wheat";
         this.setFrame(1);
         break;
       case 2:
-        this.plantType = "eggplant";
+        this.plantType = "plum";
         this.setFrame(7);
         break;
       case 3:
@@ -171,9 +189,11 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
 
   requirementsGenerator() {
     this.waterReq = Phaser.Math.Between(5, 20) * 5;
-    this.neighborReq = Phaser.Math.Between(2, 8);
     this.sunReq = Phaser.Math.Between(5, 20) * 5;
 
+    if (this.level === 0) {
+      this.neighborReq = Phaser.Math.Between(2, 8);
+    }
     this.requirements = `\nWater: ${this.waterReq}% \nSurrounding Plants: ${this.neighborReq} \n Sunlight: ${this.sunReq}`;
   }
 
