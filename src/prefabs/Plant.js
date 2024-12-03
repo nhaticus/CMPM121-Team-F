@@ -67,7 +67,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     const popupText = scene.add
       .text(
         centerX,
-        centerY - popupHeight / 2 + 20, // Position text at the top of the popup
+        centerY - popupHeight / 2, // Position text at the top of the popup
         "Days Planted: " +
           this.days +
           "\nWater Level: " +
@@ -79,13 +79,13 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
           "\nPlant Level: " +
           this.level,
         {
-          font: "16px Arial",
+          font: "14px Arial",
           color: "#ffffff",
           align: "center",
           wordWrap: { width: popupWidth - 20 },
         }
       )
-      .setOrigin(0.5)
+      .setOrigin(0.5, 0)
       .setDepth(2);
 
     const buttonYOffset = popupHeight / 2 - 40;
