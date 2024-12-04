@@ -2,8 +2,6 @@ class Game extends Phaser.Scene {
   constructor() {
     super("gameScene");
     this.plantGrid = null;
-    this.undoStack = [];
-    this.redoStack = [];
   }
 
   create() {
@@ -175,25 +173,27 @@ class Game extends Phaser.Scene {
     /* undo & redo buttons */
     // Add Undo Button
     const undoButton = this.add
-    .image(this.cameras.main.width - 100, 50, 'UndoButton')
-    .setOrigin(0.5)
-    .setScrollFactor(0)
-    .setInteractive()
-    .setDisplaySize(32, 32)
-    .on('pointerdown', () => {
-        this.undoAction(); // Link to undoAction
-    });
+      .image(this.cameras.main.width - 100, 50, "UndoButton")
+      .setOrigin(0.5)
+      .setScrollFactor(0) // Fixes button to the camera
+      .setInteractive()
+      .setDisplaySize(32, 32)
+      .on("pointerdown", () => {
+        console.log("Undo button clicked");
+        // Add functionality for undo action here
+      });
 
     // Add Redo Button
     const redoButton = this.add
-    .image(this.cameras.main.width - 50, 50, 'RedoButton')
-    .setOrigin(0.5)
-    .setScrollFactor(0)
-    .setInteractive()
-    .setDisplaySize(32, 32)
-    .on('pointerdown', () => {
-        this.redoAction(); // Link to redoAction
-    });
+      .image(this.cameras.main.width - 50, 50, "RedoButton")
+      .setOrigin(0.5)
+      .setScrollFactor(0) // Fixes button to the camera
+      .setInteractive()
+      .setDisplaySize(32, 32)
+      .on("pointerdown", () => {
+        console.log("Redo button clicked");
+        // Add functionality for redo action here
+      });
 
     const restartButton = this.add
       .image(this.cameras.main.width - 450, 270, "RestartButton")
@@ -211,115 +211,6 @@ class Game extends Phaser.Scene {
     const gridHeight = 10;
     this.plantGrid = new PlantGrid(gridWidth, gridHeight);
   }
-
-  saveState(actionType, payload) {
-    const state = {
-        actionType,
-        payload,
-        day: this.day,
-        plants: this.plants.getChildren().map((plant) => ({
-            x: plant.x,
-            y: plant.y,
-            days: plant.days,
-            water: plant.water,
-            sun: plant.sun,
-            level: plant.level,
-        })),
-    };
-    this.undoStack.push(state);
-    this.redoStack = []; // Clear redo stack after a new action
-}
-
-// Undo an action
-undoAction() {
-    if (this.undoStack.length > 0) {
-        const lastState = this.undoStack.pop();
-        this.redoStack.push(lastState);
-
-        switch (lastState.actionType) {
-            case "plant":
-                const plantToRemove = this.plants.getChildren().find(
-                    (p) => p.x === lastState.payload.x && p.y === lastState.payload.y
-                );
-                if (plantToRemove) {
-                    plantToRemove.destroy();
-                }
-                break;
-            case "water":
-                const plantToUnwater = this.plants.getChildren().find(
-                    (p) => p.x === lastState.payload.x && p.y === lastState.payload.y
-                );
-                if (plantToUnwater) {
-                    plantToUnwater.water = lastState.payload.previousWater;
-                }
-                break;
-            case "harvest":
-                const restoredPlantData = lastState.payload.harvestedPlant;
-                const restoredPlant = new Plant(
-                    this,
-                    restoredPlantData.x,
-                    restoredPlantData.y,
-                    "plant"
-                );
-                restoredPlant.days = restoredPlantData.days;
-                restoredPlant.water = restoredPlantData.water;
-                restoredPlant.sun = restoredPlantData.sun;
-                restoredPlant.level = restoredPlantData.level;
-                restoredPlant.setInteractive().on("pointerdown", () => {
-                    restoredPlant.showPlantInfoPopup(this);
-                });
-                this.plants.add(restoredPlant);
-                break;
-            case "progressDay":
-                this.day = lastState.day;
-                this.showDay();
-                break;
-        }
-    }
-}
-
-// Redo an action
-redoAction() {
-    if (this.redoStack.length > 0) {
-        const nextState = this.redoStack.pop();
-        this.undoStack.push(nextState);
-
-        switch (nextState.actionType) {
-            case "plant":
-                const replanted = new Plant(
-                    this,
-                    nextState.payload.x,
-                    nextState.payload.y,
-                    "plant"
-                );
-                replanted.setInteractive().on("pointerdown", () => {
-                    replanted.showPlantInfoPopup(this);
-                });
-                this.plants.add(replanted);
-                break;
-            case "water":
-                const plantToRewater = this.plants.getChildren().find(
-                    (p) => p.x === nextState.payload.x && p.y === nextState.payload.y
-                );
-                if (plantToRewater) {
-                    plantToRewater.water = nextState.payload.newWater;
-                }
-                break;
-            case "harvest":
-                const harvestedPlant = this.plants.getChildren().find(
-                    (p) => p.x === nextState.payload.x && p.y === nextState.payload.y
-                );
-                if (harvestedPlant) {
-                    harvestedPlant.destroy();
-                }
-                break;
-            case "progressDay":
-                this.day++;
-                this.showDay();
-                break;
-        }
-    }
-}
 
   restartGameData() {
     localStorage.setItem("day", null);
@@ -405,31 +296,11 @@ redoAction() {
   }
 
   newDay() {
-    this.saveState("progressDay");
     this.day++;
     localStorage.setItem("day", this.day);
     localStorage.setItem("plants", this.plants);
     this.checkPlantReq();
-    console.log("Day After Increment:", this.day);
-    this.showDay();
   }
-  waterPlant(plant) {
-    // Save the watering action
-    this.saveState("water", {
-        x: plant.x,
-        y: plant.y,
-        previousWater: plant.water,
-        newWater: Math.min(plant.water + 25, 100),
-    });
-
-    if (plant.water >= 75) {
-        plant.water = 100;
-    } else {
-        plant.water += 25;
-    }
-    console.log("Plant watered", plant.water);
-}
-
 
   checkPlantReq() {
     const surroundingTiles = [
@@ -480,28 +351,6 @@ redoAction() {
     });
   }
 
-  harvestPlant(plant) {
-    // Save the state before destroying the plant
-    this.saveState("harvest", {
-        x: plant.x,
-        y: plant.y,
-        harvestedPlant: {
-            x: plant.x,
-            y: plant.y,
-            days: plant.days,
-            water: plant.water,
-            sun: plant.sun,
-            level: plant.level,
-        },
-    });
-
-    // Destroy the plant
-    plant.destroy();
-
-    console.log(`Plant at (${plant.x}, ${plant.y}) harvested.`);
-}
-
-  
   farmingUpdate() {
     const tile = this.tiledGroundLayer.getTileAtWorldXY(
       this.player.x,
