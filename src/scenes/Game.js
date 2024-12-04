@@ -51,7 +51,9 @@ class Game extends Phaser.Scene {
     this.decorLayer.setCollisionByExclusion([-1]);
     this.physics.add.collider(this.player, this.decorLayer);
 
+    console.log("Not empty!");
     this.plants = this.add.group();
+    
 
     /*  camera  */
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
@@ -76,7 +78,7 @@ class Game extends Phaser.Scene {
     });
 
     /* day */
-    this.day = 1;
+    this.day = parseInt(localStorage.getItem('day')) || 1;
     this.showDay();
 
     /*  house */
@@ -85,6 +87,7 @@ class Game extends Phaser.Scene {
     /* inventory */
 
     let inventory = [];
+
 
     const inventorybutton = new Inventory({
       scene: this,
@@ -203,7 +206,24 @@ class Game extends Phaser.Scene {
         console.log("Redo button clicked");
         // Add functionality for redo action here
       });
+
+    const restartButton = this.add
+      .image(this.cameras.main.width -450, 270, "RestartButton")
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setInteractive()
+      .setDisplaySize(32, 32)
+      .on("pointerdown", () => {
+        console.log("Restart Button clicked");
+        this.restartGameData();
+      })
   }
+
+  restartGameData(){
+    localStorage.setItem('day', null);
+    localStorage.setItem('plants', null);
+  }
+
 
   onPressed(content) {
     //console.log(this.contents);
@@ -285,6 +305,8 @@ class Game extends Phaser.Scene {
 
   newDay() {
     this.day++;
+    localStorage.setItem('day', this.day);
+    localStorage.setItem('plants', this.plants);
     this.checkPlantReq();
   }
 
