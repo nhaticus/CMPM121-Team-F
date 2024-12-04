@@ -1,6 +1,7 @@
 class Game extends Phaser.Scene {
   constructor() {
     super("gameScene");
+    this.plantGrid = null;
   }
 
   create() {
@@ -14,7 +15,7 @@ class Game extends Phaser.Scene {
     const farmTiles = map.addTilesetImage("FarmTiles", "farmTiles");
     const grass = map.addTilesetImage("Grass", "grassTiles");
 
-    /*  layers  */
+    /* layers */
     this.groundLayer = map.createLayer(
       "Grass-n-Paths",
       [grass, farmTiles],
@@ -25,23 +26,12 @@ class Game extends Phaser.Scene {
     this.decorLayer = map.createLayer("Decor", [decor, fences, tree], 0, 0);
     this.waterLayer = map.createLayer("Water", water, 0, 0);
     this.tiledGroundLayer = map.createLayer("Tiled Ground", tiledGround, 0, 0);
-    /* layers */
-    const groundLayer = map.createLayer(
-      "Grass-n-Paths",
-      [grass, farmTiles],
-      0,
-      0
-    );
-    const houseLayer = map.createLayer("House", farmTiles, 0, 0);
-    const decorLayer = map.createLayer("Decor", [decor, fences, tree], 0, 0);
-    const waterLayer = map.createLayer("Water", water, 0, 0);
-    const tiledGroundLayer = map.createLayer("Tiled Ground", tiledGround, 0, 0);
 
-    /*  player  */
+    /* player */
     this.player = new Player(this, 500, 500, "player", 0);
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-    /*  collisions  */
+    /* collisions */
     this.waterLayer.setCollisionByExclusion([-1]);
     this.physics.add.collider(this.player, this.waterLayer);
 
@@ -53,7 +43,6 @@ class Game extends Phaser.Scene {
 
     console.log("Not empty!");
     this.plants = this.add.group();
-    
 
     /*  camera  */
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
@@ -78,7 +67,7 @@ class Game extends Phaser.Scene {
     });
 
     /* day */
-    this.day = parseInt(localStorage.getItem('day')) || 1;
+    this.day = parseInt(localStorage.getItem("day")) || 1;
     this.showDay();
 
     /*  house */
@@ -87,7 +76,6 @@ class Game extends Phaser.Scene {
     /* inventory */
 
     let inventory = [];
-
 
     const inventorybutton = new Inventory({
       scene: this,
@@ -208,7 +196,7 @@ class Game extends Phaser.Scene {
       });
 
     const restartButton = this.add
-      .image(this.cameras.main.width -450, 270, "RestartButton")
+      .image(this.cameras.main.width - 450, 270, "RestartButton")
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setInteractive()
@@ -216,14 +204,18 @@ class Game extends Phaser.Scene {
       .on("pointerdown", () => {
         console.log("Restart Button clicked");
         this.restartGameData();
-      })
+      });
+
+    /* Initialize PlantGrid */
+    const gridWidth = 10;
+    const gridHeight = 10;
+    this.plantGrid = new PlantGrid(gridWidth, gridHeight);
   }
 
-  restartGameData(){
-    localStorage.setItem('day', null);
-    localStorage.setItem('plants', null);
+  restartGameData() {
+    localStorage.setItem("day", null);
+    localStorage.setItem("plants", null);
   }
-
 
   onPressed(content) {
     //console.log(this.contents);
@@ -305,8 +297,8 @@ class Game extends Phaser.Scene {
 
   newDay() {
     this.day++;
-    localStorage.setItem('day', this.day);
-    localStorage.setItem('plants', this.plants);
+    localStorage.setItem("day", this.day);
+    localStorage.setItem("plants", this.plants);
     this.checkPlantReq();
   }
 
@@ -374,18 +366,35 @@ class Game extends Phaser.Scene {
       if (this.plantCheck(tile)) {
         return;
       }
-      const plant = new Plant(
-        this,
-        tile.getCenterX(),
-        tile.getCenterY(),
-        "plant"
-      );
-      plant.setInteractive().on("pointerdown", () => {
-        plant.showPlantInfoPopup(this);
-      });
-      this.plants.add(plant);
+      console.log(tile.x, tile.y);
+      this.addPlant(tile.getCenterX(), tile.getCenterY(), "plant");
     }
   }
+
+  addPlant(x, y, texture) {
+    const plant = new Plant(this, x, y, texture);
+    plant.setInteractive().on("pointerdown", () => {
+      plant.showPlantInfoPopup(this);
+    });
+
+    this.plantGrid.setPlant(x, y, plant);
+    this.plants.add(plant);
+
+    console.log(x, y);
+    this.plantGrid.debug();
+  }
+
+  getPlant(x, y) {
+    return this.plantGrid.getPlant(x, y);
+  }
+
+  growPlant(x, y) {
+    const plant = this.getPlant(x, y);
+    if (plant) {
+      plant.grow();
+    }
+  }
+
   update() {
     this.player.update(this.cursors, this);
 

@@ -7,9 +7,6 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
 
     this.setOrigin(0.5);
 
-    /* Randomize plant type */
-    this.setPlantType(Phaser.Math.Between(1, 3));
-
     /* Some global variables */
     this.plantType = "";
     this.neightbor = 0;
@@ -18,8 +15,10 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.days = 0;
     this.level = 0;
     this.sun = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
-
     this.requirements = "";
+
+    /* Randomize plant type */
+    this.setPlantType(Phaser.Math.Between(1, 3));
 
     this.requirementsGenerator();
   }
@@ -45,18 +44,25 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   setPlantType(x) {
     switch (x) {
       case 1:
-        this.plantType = "wheat";
+        this.plantType = "Wheat";
         this.setFrame(1);
+        // console.log(this.plantType);
         break;
       case 2:
-        this.plantType = "plum";
+        this.plantType = "Plum";
         this.setFrame(7);
+        // console.log(this.plantType);
         break;
       case 3:
-        this.plantType = "tomato";
+        this.plantType = "Tomato";
         this.setFrame(13);
+        // console.log(this.plantType);
         break;
     }
+  }
+
+  getPlantType() {
+    return this.plantType;
   }
 
   grow() {
