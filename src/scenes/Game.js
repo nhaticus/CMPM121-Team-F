@@ -219,7 +219,40 @@ class Game extends Phaser.Scene {
       .on("pointerdown", () => {
         this.restartGameData();
       })
+  
+      // Add Save Button
+      const saveButton = this.add
+      .image(
+        this.cameras.main.width - 50, // X position: near the right edge
+        this.cameras.main.height - 50, // Y position: near the bottom edge
+        "SaveButton" // The key for the save.png image (make sure to preload this key in your Load.js or preload method)
+      )
+      .setOrigin(0.5)
+      .setScrollFactor(0) // Ensures it stays fixed on the screen
+      .setInteractive() // Makes the image clickable
+      .setDisplaySize(64, 32) // Adjust size as needed
+      .on("pointerdown", () => {
+        this.saveGame(); // Add functionality to save the game
+      });
   }
+  saveGame() {
+    const gameState = {
+      day: this.day,
+      plants: this.plants.getChildren().map((plant) => ({
+        x: plant.x,
+        y: plant.y,
+        days: plant.days,
+        water: plant.water,
+        sun: plant.sun,
+        level: plant.level,
+      })),
+    };
+  
+    // Save to localStorage
+    localStorage.setItem("gameState", JSON.stringify(gameState));
+    console.log("Game saved:", gameState);
+  }
+  
 
   undoAction() {
     console.log("Undo Action Triggered");
