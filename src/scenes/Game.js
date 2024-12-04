@@ -53,8 +53,6 @@ class Game extends Phaser.Scene {
 
     this.decorLayer.setCollisionByExclusion([-1]);
     this.physics.add.collider(this.player, this.decorLayer);
-
-    console.log("Not empty!");
     this.plants = this.add.group();
 
     
@@ -188,7 +186,6 @@ class Game extends Phaser.Scene {
 
     inventory.push(inventorybutton7);
 
-    inventory.forEach((slot) => console.log(slot.contents));
 
     /* undo & redo buttons */
     // Add Undo Button
@@ -220,7 +217,6 @@ class Game extends Phaser.Scene {
       .setInteractive()
       .setDisplaySize(32, 32)
       .on("pointerdown", () => {
-        console.log("Restart Button clicked");
         this.restartGameData();
       })
   }
@@ -399,7 +395,7 @@ loadState(state) {
 
 
   onPressed(content) {
-    //console.log(this.contents);
+
   }
 
   showDay() {
@@ -477,14 +473,11 @@ loadState(state) {
   }
 
   newDay() {
-    console.log("New Day Triggered");
-
     // Save the current state before progressing
     this.saveState("progressDay", { day: this.day });
 
     // Increment the day
     this.day++;
-    console.log("Day After Increment:", this.day);
 
     // Update plant requirements and display the day
     this.checkPlantReq();
@@ -511,8 +504,6 @@ loadState(state) {
         const tileX = plant.x + offset.x * 16;
         const tileY = plant.y + offset.y * 16;
         const tile = this.tiledGroundLayer.getTileAtWorldXY(tileX, tileY);
-
-        // console.log(`Checking tile at (${tileX}, ${tileY})`);
 
         if (tile) {
           // console.log(`Tile found at (${tileX}, ${tileY})`);
@@ -559,7 +550,6 @@ loadState(state) {
             return;
         }
         const plant = this.addPlant( tile.getCenterX(), tile.getCenterY(), "plant");
-        // const plant = new Plant(this, tile.getCenterX(), tile.getCenterY(), "plant");
     }
 }
 
