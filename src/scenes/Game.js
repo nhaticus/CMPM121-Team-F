@@ -3,6 +3,7 @@ class Game extends Phaser.Scene {
     super("gameScene");
     this.undoStack = [];
     this.redoStack = [];
+    this.plantGrid = null;
   }
 
   create() {
