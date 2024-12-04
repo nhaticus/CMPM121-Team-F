@@ -56,8 +56,13 @@ class Game extends Phaser.Scene {
 
     console.log("Not empty!");
     this.plants = this.add.group();
-    
 
+    
+    /* Initialize PlantGrid */
+    const gridWidth = 10;
+    const gridHeight = 10;
+    this.plantGrid = new PlantGrid(gridWidth, gridHeight);
+    
     /*  camera  */
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -536,6 +541,7 @@ loadState(state) {
       );
     });
   }
+  
 
   farmingUpdate() {
     const tile = this.tiledGroundLayer.getTileAtWorldXY(
@@ -552,24 +558,38 @@ loadState(state) {
         if (this.plantCheck(tile)) {
             return;
         }
-        const plant = new Plant(
-            this,
-            tile.getCenterX(),
-            tile.getCenterY(),
-            "plant"
-        );
-
-        // Save the planting action
-        this.saveState("plant", { x: plant.x, y: plant.y });
-
-        plant.setInteractive().on("pointerdown", () => {
-            plant.showPlantInfoPopup(this);
-        });
-        this.plants.add(plant);
-        console.log(this.plants);
+        const plant = this.addPlant( tile.getCenterX(), tile.getCenterY(), "plant");
+        // const plant = new Plant(this, tile.getCenterX(), tile.getCenterY(), "plant");
     }
 }
 
+addPlant(x, y, texture) {
+  const plant = new Plant(this, x, y, texture);
+  plant.setInteractive().on("pointerdown", () => {
+    plant.showPlantInfoPopup(this);
+  });
+
+  // Save the planting action
+  this.saveState("plant", { x: plant.x, y: plant.y });
+
+  this.plantGrid.setPlant(x, y, plant);
+  this.plants.add(plant);
+
+  console.log(this.plantGrid)
+
+  return plant
+}
+
+getPlant(x, y) {
+  return this.plantGrid.getPlant(x, y);
+}
+
+growPlant(x, y) {
+  const plant = this.getPlant(x, y);
+  if (plant) {
+    plant.grow();
+  }
+}
 harvestPlant(plant) {
   // Save the state before destroying the plant
   this.saveState("harvest", {
@@ -607,8 +627,6 @@ waterPlant(plant) {
   }
   console.log("Plant watered", plant.water);
 }
-
-
 
   update() {
     this.player.update(this.cursors, this);
