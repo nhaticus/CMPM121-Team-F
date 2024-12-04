@@ -109,58 +109,56 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     const buttonYOffset = popupHeight / 2 - 40;
 
     const harvestButton = scene.add
-    .text(centerX - 80, centerY + buttonYOffset, "Harvest", {
+      .text(centerX - 80, centerY + buttonYOffset, "Harvest", {
         font: "14px Arial",
         color: "#ffffff",
         backgroundColor: "#00ff00",
         padding: { x: 8, y: 4 },
-    })
-    .setInteractive()
-    .setOrigin(0.5)
-    .setDepth(2)
-    .on("pointerdown", () => {
-        if (this.level === 3) {
-            // Delegate harvesting logic to Game.js
-            scene.harvestPlant(this);
-            scene.closePopup(
-                overlay,
-                popupText,
-                harvestButton,
-                waterButton,
-                closeButton
-            );
-        }
-    });
-
-
-      const waterButton = scene.add
-      .text(centerX + 80, centerY + buttonYOffset, "Water", {
-          font: "14px Arial",
-          color: "#ffffff",
-          backgroundColor: "#0000ff",
-          padding: { x: 8, y: 4 },
       })
       .setInteractive()
       .setOrigin(0.5)
       .setDepth(2)
       .on("pointerdown", () => {
-          // Call the waterPlant method to water the plant and save its state
-          scene.waterPlant(this);
-  
-          popupText.setText(
-              "Days Planted: " +
-                  this.days +
-                  "\nWater Level: " +
-                  this.water +
-                  "%\nCurrent Sunlight: " +
-                  this.sun +
-                  "%\nRequirements: " +
-                  this.requirements +
-                  "\nPlant Level: " +
-                  this.level
+        if (this.level === 3) {
+          // Delegate harvesting logic to Game.js
+          scene.harvestPlant(this);
+          scene.closePopup(
+            overlay,
+            popupText,
+            harvestButton,
+            waterButton,
+            closeButton
           );
+        }
       });
-  
+
+    const waterButton = scene.add
+      .text(centerX + 80, centerY + buttonYOffset, "Water", {
+        font: "14px Arial",
+        color: "#ffffff",
+        backgroundColor: "#0000ff",
+        padding: { x: 8, y: 4 },
+      })
+      .setInteractive()
+      .setOrigin(0.5)
+      .setDepth(2)
+      .on("pointerdown", () => {
+        // Call the waterPlant method to water the plant and save its state
+        scene.waterPlant(this);
+
+        popupText.setText(
+          "Days Planted: " +
+            this.days +
+            "\nWater Level: " +
+            this.water +
+            "%\nCurrent Sunlight: " +
+            this.sun +
+            "%\nRequirements: " +
+            this.requirements +
+            "\nPlant Level: " +
+            this.level
+        );
+      });
 
     const closeButton = scene.add
       .text(centerX, centerY + popupHeight / 2 - 20, "Close", {
@@ -216,5 +214,11 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     if (hasRequiredNeighbors && hasRequiredWater && canLevelUp) {
       this.grow();
     }
+  }
+
+  /*  for degbugging purposes */
+  fullyGrowPlant() {
+    this.level = 3;
+    this.setFrame(this.frame.name + 3);
   }
 }

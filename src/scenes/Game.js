@@ -555,6 +555,7 @@ loadState(state) {
 
 addPlant(x, y, texture) {
   const plant = new Plant(this, x, y, texture);
+  plant.fullyGrowPlant();
   plant.setInteractive().on("pointerdown", () => {
     plant.showPlantInfoPopup(this);
   });
