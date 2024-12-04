@@ -115,27 +115,30 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     const buttonYOffset = popupHeight / 2 - 40;
 
     const harvestButton = scene.add
-      .text(centerX - 80, centerY + buttonYOffset, "Harvest", {
+    .text(centerX - 80, centerY + buttonYOffset, "Harvest", {
         font: "14px Arial",
         color: "#ffffff",
         backgroundColor: "#00ff00",
         padding: { x: 8, y: 4 },
-      })
-      .setInteractive()
-      .setOrigin(0.5)
-      .setDepth(2)
-      .on("pointerdown", () => {
+    })
+    .setInteractive()
+    .setOrigin(0.5)
+    .setDepth(2)
+    .on("pointerdown", () => {
         if (this.level === 3) {
-          this.destroy();
-          scene.closePopup(
-            overlay,
-            popupText,
-            harvestButton,
-            waterButton,
-            closeButton
-          );
+            // Delegate harvesting logic to Game.js
+            scene.harvestPlant(this);
+            scene.closePopup(
+                overlay,
+                popupText,
+                harvestButton,
+                waterButton,
+                closeButton
+            );
         }
-      });
+    });
+
+
 
     const waterButton = scene.add
       .text(centerX + 80, centerY + buttonYOffset, "Water", {
