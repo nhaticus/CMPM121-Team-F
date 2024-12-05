@@ -4,6 +4,7 @@ class Game extends Phaser.Scene {
     this.undoStack = [];
     this.redoStack = [];
     this.plantGrid = null;
+    this.harvestedPlantTypes = new Set(); // Track harvested plant types
   }
 
   create() {
@@ -235,6 +236,104 @@ class Game extends Phaser.Scene {
         this.saveGame(); // Add functionality to save the game
       });
   }
+
+  harvestPlant(plant) {
+    console.log(`Attempting to harvest plant with type: ${plant.plantType}`); // Debugging log
+  
+    // Save the state before destroying the plant
+    this.saveState("harvest", {
+      x: plant.x,
+      y: plant.y,
+      harvestedPlant: {
+        x: plant.x,
+        y: plant.y,
+        plantType: plant.plantType, // Save the type
+        days: plant.days,
+        water: plant.water,
+        sun: plant.sun,
+        level: plant.level,
+      },
+    });
+  
+    console.log("Before harvesting:", Array.from(this.harvestedPlantTypes));
+    this.harvestedPlantTypes.add(plant.plantType);
+    console.log("After harvesting:", Array.from(this.harvestedPlantTypes));
+  
+    // Check if all plant types are harvested
+    if (
+      this.harvestedPlantTypes.has("plum") &&
+      this.harvestedPlantTypes.has("tomato") &&
+      this.harvestedPlantTypes.has("wheat")
+    ) {
+      console.log("All types harvested - Showing popup!");
+      this.showCompletionPopup();
+    } else {
+      console.log(
+        "Missing types:",
+        ["plum", "tomato", "wheat"].filter(
+          (type) => !this.harvestedPlantTypes.has(type)
+        )
+      );
+    }
+  
+    // Destroy the plant
+    plant.destroy();
+    console.log(`Plant at (${plant.x}, ${plant.y}) harvested.`);
+  }
+
+  showCompletionPopup() {
+    console.log("Popup triggered");
+  
+    // Pause the game temporarily (remove this line if it causes issues)
+    // this.physics.pause();
+  
+    // Get screen center positions
+    const centerX = this.cameras.main.midPoint.x;
+    const centerY = this.cameras.main.midPoint.y;
+  
+    // Create the popup background
+    const overlay = this.add
+      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
+      .setOrigin(0.5)
+      .setDepth(100)
+      .setStrokeStyle(2, 0xffffff); // Add a border for visibility
+    console.log("Overlay created");
+  
+    // Add popup text
+    const popupText = this.add
+      .text(centerX, centerY - 30, "You Harvested Every Type of Plant!", {
+        font: "18px Arial",
+        color: "#ffffff",
+        align: "center",
+      })
+      .setOrigin(0.5)
+      .setDepth(101);
+    console.log("Popup text created");
+  
+    // Add the 'Close' button
+    const closeButton = this.add
+      .text(centerX, centerY + 50, "Close", {
+        font: "18px Arial",
+        color: "#ff0000",
+        backgroundColor: "#000000",
+        padding: { x: 10, y: 5 },
+      })
+      .setInteractive()
+      .setDepth(102)
+      .on("pointerdown", () => {
+        console.log("Close button clicked");
+        this.closePopup(overlay, popupText, closeButton);
+      });
+    console.log("Close button created");
+    console.log("Popup displayed");
+  }
+
+  closePopup(...elements) {
+    elements.forEach((element) => element.destroy());
+    this.physics.resume();
+  }
+
+
   saveGame() {
     const gameState = {
       day: this.day,
@@ -459,6 +558,7 @@ loadState(state) {
     const overlay = this.add
       .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
       .setOrigin(0.5);
+      
 
     // Add text for the popup
     const popupText = this.add
@@ -613,28 +713,8 @@ growPlant(x, y) {
   if (plant) {
     plant.grow();
   }
+
 }
-harvestPlant(plant) {
-  // Save the state before destroying the plant
-  this.saveState("harvest", {
-      x: plant.x,
-      y: plant.y,
-      harvestedPlant: {
-          x: plant.x,
-          y: plant.y,
-          days: plant.days,
-          water: plant.water,
-          sun: plant.sun,
-          level: plant.level,
-      },
-  });
-
-  // Destroy the plant
-  plant.destroy();
-
-  console.log(`Plant at (${plant.x}, ${plant.y}) harvested.`);
-}
-
 waterPlant(plant) {
   // Generate a random water increase between 20 and 100
   const randomWaterIncrease = Phaser.Math.Between(20, 100);
