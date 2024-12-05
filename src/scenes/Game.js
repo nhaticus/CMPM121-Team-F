@@ -636,21 +636,23 @@ harvestPlant(plant) {
 }
 
 waterPlant(plant) {
+  // Generate a random water increase between 20 and 100
+  const randomWaterIncrease = Phaser.Math.Between(20, 100);
+
   // Save the watering action
   this.saveState("water", {
-      x: plant.x,
-      y: plant.y,
-      previousWater: plant.water,
-      newWater: Math.min(plant.water + 25, 100),
+    x: plant.x,
+    y: plant.y,
+    previousWater: plant.water,
+    newWater: Math.min(plant.water + randomWaterIncrease, 100),
   });
 
-  if (plant.water >= 75) {
-      plant.water = 100;
-  } else {
-      plant.water += 25;
-  }
-  console.log("Plant watered", plant.water);
+  // Apply the random water increase, ensuring the max water level is 100
+  plant.water = Math.min(plant.water + randomWaterIncrease, 100);
+
+  console.log(`Plant watered: ${plant.water} (+${randomWaterIncrease})`);
 }
+
 
   update() {
     this.player.update(this.cursors, this);
