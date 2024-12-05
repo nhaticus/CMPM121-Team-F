@@ -60,7 +60,23 @@ class Game extends Phaser.Scene {
     /* Initialize PlantGrid */
     const gridWidth = 10;
     const gridHeight = 10;
-    this.plantGrid = new PlantGrid(gridWidth, gridHeight);
+
+    if(localStorage){
+      console.log("there is local storage!");
+      const savedGrid = localStorage.getItem("gridState");
+      console.log(savedGrid);
+      if(savedGrid){
+        console.log("SAVED GRID");
+        this.plantGrid = new PlantGrid(gridWidth, gridHeight);
+        this.plantGrid.setGrid(JSON.parse(savedGrid));
+      }  
+      else{
+        console.log("making new grid");
+        this.plantGrid = new PlantGrid(gridWidth, gridHeight);
+    }
+    }
+  
+
     
     /*  camera  */
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
@@ -523,6 +539,8 @@ loadState(state) {
   restartGameData(){
     localStorage.setItem('day', null);
     localStorage.setItem('plants', null);
+    localStorage.setItem('gridState', null);
+    localStorage.clear();
   }
 
 
@@ -611,6 +629,12 @@ loadState(state) {
 
     // Increment the day
     this.day++;
+
+    // Save Data
+    localStorage.setItem("day", this.day);
+    console.log(this.plantGrid.getGrid());
+    localStorage.setItem("gridState", JSON.stringify(this.plantGrid.getGrid()));
+
 
     // Update plant requirements and display the day
     this.checkPlantReq();

@@ -17,4 +17,12 @@ class PlantGrid{
       const index = this.getIndex(x, y);
       this.grid[index] = plant;
     }
+
+    setGrid(newGrid){
+      this.grid = newGrid;
+    }
+
+    getGrid(){
+      return this.grid;
+    }
   }
