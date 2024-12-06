@@ -255,7 +255,7 @@ class Game extends Phaser.Scene {
 
   harvestPlant(plant) {
     console.log(`Attempting to harvest plant with type: ${plant.plantType}`); // Debugging log
-  
+
     // Save the state before destroying the plant
     this.saveState("harvest", {
       x: plant.x,
@@ -270,32 +270,11 @@ class Game extends Phaser.Scene {
         level: plant.level,
       },
     });
-  
-    console.log("Before harvesting:", Array.from(this.harvestedPlantTypes));
-    this.harvestedPlantTypes.add(plant.plantType);
-    console.log("After harvesting:", Array.from(this.harvestedPlantTypes));
-  
-    // Check if all plant types are harvested
-    if (
-      this.harvestedPlantTypes.has("plum") &&
-      this.harvestedPlantTypes.has("tomato") &&
-      this.harvestedPlantTypes.has("wheat")
-    ) {
-      console.log("All types harvested - Showing popup!");
-      this.showCompletionPopup();
-    } else {
-      console.log(
-        "Missing types:",
-        ["plum", "tomato", "wheat"].filter(
-          (type) => !this.harvestedPlantTypes.has(type)
-        )
-      );
-    }
-  
-    // Destroy the plant
+
     plant.destroy();
     console.log(`Plant at (${plant.x}, ${plant.y}) harvested.`);
   }
+
 
   showCompletionPopup() {
     console.log("Popup triggered");
@@ -372,139 +351,126 @@ class Game extends Phaser.Scene {
   undoAction() {
     console.log("Undo Action Triggered");
     if (this.undoStack.length > 0) {
-        const lastState = this.undoStack.pop(); // Get the last state
-        this.redoStack.push(lastState);        // Save it for redo
+      const lastState = this.undoStack.pop();
+      this.redoStack.push(lastState);
 
-        switch (lastState.actionType) {
+      switch (lastState.actionType) {
+        case "plant":
+          console.log("Undoing Plant Action");
+          const lastPlant = this.plants.getChildren().find(
+            (plant) =>
+              plant.x === lastState.payload.x && plant.y === lastState.payload.y
+          );
+          if (lastPlant) lastPlant.destroy();
+          break;
+
+        case "water":
+          console.log("Undoing Water Action");
+          const wateredPlant = this.plants.getChildren().find(
+            (plant) =>
+              plant.x === lastState.payload.x && plant.y === lastState.payload.y
+          );
+          if (wateredPlant) {
+            wateredPlant.water = lastState.payload.previousWater; // Revert water level
+          }
+          break;
+
+        case "harvest":
+          console.log("Undoing Harvest Action");
+          const harvestedPlant = lastState.payload.harvestedPlant;
+          const restoredPlant = new Plant(
+            this,
+            harvestedPlant.x,
+            harvestedPlant.y,
+            "plant"
+          );
+          Object.assign(restoredPlant, harvestedPlant); // Restore all properties
+          this.plants.add(restoredPlant);
+          break;
+
+        default:
+          console.log("Unknown Action Type");
+      }
+    } else {
+      console.log("Undo Stack is Empty");
+    }
+  }
+
+  
+  redoAction() {
+    console.log("Redo Action Triggered");
+    if (this.redoStack.length > 0) {
+        const nextState = this.redoStack.pop();
+        this.undoStack.push(nextState);
+
+        switch (nextState.actionType) {
             case "plant":
-                console.log("Undoing Plant Action");
-                // Remove the last planted plant
-                const lastPlant = this.plants.getChildren().find((plant) => 
-                    plant.x === lastState.payload.x && 
-                    plant.y === lastState.payload.y
+                console.log("Redoing Plant Action");
+                const plant = new Plant(
+                    this,
+                    nextState.payload.x,
+                    nextState.payload.y,
+                    "plant"
                 );
-                if (lastPlant) {
-                    lastPlant.destroy();
-                }
+
+                // Restore interactivity
+                plant.setInteractive().on("pointerdown", () => {
+                    plant.showPlantInfoPopup(this);
+                });
+
+                this.plants.add(plant);
                 break;
 
             case "water":
-                console.log("Undoing Water Action");
-                // Find and revert the water level of the specific plant
-                const wateredPlant = this.plants.getChildren().find((plant) => 
-                    plant.x === lastState.payload.x && 
-                    plant.y === lastState.payload.y
+                console.log("Redoing Water Action");
+                const plantToWater = this.plants.getChildren().find(
+                    (plant) =>
+                        plant.x === nextState.payload.x &&
+                        plant.y === nextState.payload.y
                 );
-                if (wateredPlant) {
-                    wateredPlant.water = lastState.payload.previousWater;
+                if (plantToWater) {
+                    plantToWater.water = nextState.payload.newWater; // Apply new water level
                 }
                 break;
 
             case "harvest":
-                console.log("Undoing Harvest Action");
-                // Re-add the harvested plant
-                const harvestedPlant = lastState.payload.harvestedPlant;
-                const restoredPlant = new Plant(this, harvestedPlant.x, harvestedPlant.y, "plant");
-                restoredPlant.days = harvestedPlant.days;
-                restoredPlant.water = harvestedPlant.water;
-                restoredPlant.sun = harvestedPlant.sun;
-                restoredPlant.level = harvestedPlant.level;
-                this.plants.add(restoredPlant);
-                break;
+                console.log("Redoing Harvest Action");
+                const harvestedPlant = nextState.payload.harvestedPlant;
+                const restoredPlant = new Plant(
+                    this,
+                    harvestedPlant.x,
+                    harvestedPlant.y,
+                    "plant"
+                );
+                Object.assign(restoredPlant, harvestedPlant);
 
-            case "progressDay":
-                console.log("Undoing Day Progression");
-                this.day = lastState.day; // Revert the day
-                this.showDay();          // Update day display
-                this.loadState(lastState); // Restore plants
+                // Restore interactivity
+                restoredPlant.setInteractive().on("pointerdown", () => {
+                    restoredPlant.showPlantInfoPopup(this);
+                });
+
+                this.plants.add(restoredPlant);
                 break;
 
             default:
                 console.log("Unknown Action Type");
         }
-        console.log("Undo Stack After Pop:", this.undoStack);
     } else {
-        console.log("Undo Stack is Empty");
+        console.log("Redo Stack is Empty");
     }
 }
 
-  
-redoAction() {
-  console.log("Redo Action Triggered");
-  if (this.redoStack.length > 0) {
-      const nextState = this.redoStack.pop(); // Get the next state
-      this.undoStack.push(nextState);        // Save it for undo
-
-      switch (nextState.actionType) {
-          case "plant":
-              console.log("Redoing Plant Action");
-              const plant = new Plant(this, nextState.payload.x, nextState.payload.y, "plant");
-              plant.setInteractive().on("pointerdown", () => {
-                  plant.showPlantInfoPopup(this);
-              });
-              this.plants.add(plant);
-              break;
-
-          case "water":
-              console.log("Redoing Water Action");
-              const plantToWater = this.plants.getChildren().find((p) =>
-                  p.x === nextState.payload.x && p.y === nextState.payload.y
-              );
-              if (plantToWater) {
-                  plantToWater.water = nextState.payload.newWater;
-              }
-              break;
-
-          case "harvest":
-              console.log("Redoing Harvest Action");
-              const plantToHarvest = new Plant(this, nextState.payload.x, nextState.payload.y, "plant");
-              plantToHarvest.days = nextState.payload.harvestedPlant.days;
-              plantToHarvest.water = nextState.payload.harvestedPlant.water;
-              plantToHarvest.sun = nextState.payload.harvestedPlant.sun;
-              plantToHarvest.level = nextState.payload.harvestedPlant.level;
-              plantToHarvest.setInteractive().on("pointerdown", () => {
-                  plantToHarvest.showPlantInfoPopup(this);
-              });
-              this.plants.add(plantToHarvest);
-              break;
-
-          case "progressDay":
-              console.log("Redoing Day Progression");
-
-              // Restore the saved day value and re-progress
-              this.day = nextState.payload.day + 1;
-              console.log("Day Redone:", this.day);
-              this.showDay(); // Update the day text
-              break;
-
-          default:
-              console.log("Unknown Action Type");
-      }
-
-      console.log("Redo Stack After Pop:", this.redoStack);
-  } else {
-      console.log("Redo Stack is Empty");
-  }
-}
 
 
 
 
 saveState(actionType, payload) {
   const state = {
-      actionType,   // Type of action (e.g., "plant", "water", "progressDay")
-      payload,      // Additional data specific to the action
-      day: this.day,
-      plants: this.plants.getChildren().map((plant) => ({
-          x: plant.x,
-          y: plant.y,
-          days: plant.days,
-          water: plant.water,
-          sun: plant.sun,
-          level: plant.level,
-      })),
+    actionType, // e.g., "plant", "water", "harvest"
+    payload,
+    day: this.day,
   };
-  console.log("Saving State with Action:", actionType, state); // Debug
+  console.log("Saving State:", actionType, state); // Debugging
   this.undoStack.push(state);
   this.redoStack = []; // Clear redo stack on new action
 }
@@ -740,7 +706,6 @@ growPlant(x, y) {
 
 }
 waterPlant(plant) {
-  // Generate a random water increase between 20 and 100
   const randomWaterIncrease = Phaser.Math.Between(20, 100);
 
   // Save the watering action
@@ -751,9 +716,7 @@ waterPlant(plant) {
     newWater: Math.min(plant.water + randomWaterIncrease, 100),
   });
 
-  // Apply the random water increase, ensuring the max water level is 100
   plant.water = Math.min(plant.water + randomWaterIncrease, 100);
-
   console.log(`Plant watered: ${plant.water} (+${randomWaterIncrease})`);
 }
 
