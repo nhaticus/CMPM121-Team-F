@@ -4,20 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Team F Game</title>
-
-    <!-- Link the PWA manifest -->
-    <link rel="manifest" href="manifest.json" />
-
-    <!-- Theme color for address bar (mobile) -->
-    <meta name="theme-color" content="#ffffff" />
-
-    <!-- Icons (optional, fallback for devices without PWA support) -->
-    <link rel="icon" sizes="192x192" href="icons/icon-192.png" />
-    <link rel="apple-touch-icon" href="icons/icon-192.png" />
   </head>
   <body>
-    <!-- Phaser and Game Scripts -->
     <script src="/lib/phaser.js"></script>
+    <!-- Phaser library -->
     <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
     <script src="/src/prefabs/Player.js"></script>
     <script src="/src/prefabs/Plant.js"></script>
@@ -26,22 +16,5 @@
     <script src="/src/scenes/Load.js"></script>
     <script src="/src/scenes/Game.js"></script>
     <script src="/src/main.js"></script>
-
-    <!-- Register the Service Worker -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("/service-worker.js")
-          .then((registration) => {
-            console.log(
-              "Service Worker registered with scope:",
-              registration.scope
-            );
-          })
-          .catch((error) => {
-            console.error("Service Worker registration failed:", error);
-          });
-      }
-    </script>
   </body>
 </html>
