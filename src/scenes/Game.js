@@ -1,3 +1,5 @@
+import { t, setLanguage } from '../utils/localization.js'; // Adjust the path as needed
+
 class Game extends Phaser.Scene {
   constructor() {
     super("gameScene");
@@ -9,6 +11,9 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+    
+    setLanguage("en");
+
     // Initialize the game based on the active save slot
     this.loadGameSlot(this.activeSaveSlot);
 
@@ -394,7 +399,7 @@ saveGameSlot(slot) {
   
     // Add popup text
     const popupText = this.add
-      .text(centerX, centerY - 60, "Select a Save Slot.", {
+      .text(centerX, centerY - 60, t("SAVE_SLOT"), {
         font: "18px Arial",
         color: "#ffffff",
         align: "center",
@@ -407,7 +412,7 @@ saveGameSlot(slot) {
     const slots = [1, 2, 3];
     slots.forEach((slot, index) => {
       const slotButton = this.add
-        .text(centerX, centerY - 30 + index * 40, `Save ${slot}`, {
+        .text(centerX, centerY - 30 + index * 40, ("SAVE") + `${slot}`, {
           font: "16px Arial",
           color: "#ffffff",
           backgroundColor: "#000000",
@@ -525,7 +530,7 @@ quitGame() {
   
     // Add popup text
     const popupText = this.add
-      .text(centerX, centerY - 30, "You Harvested Every Type of Plant!", {
+      .text(centerX, centerY - 30, t("HARVESTED_ALL"), {
         font: "18px Arial",
         color: "#ffffff",
         align: "center",
@@ -909,7 +914,7 @@ loadState(state) {
 
     // Add text for the popup
     const popupText = this.add
-      .text(centerX, centerY - 50, "Would you like to go to sleep?", {
+      .text(centerX, centerY - 50, t("POPUP_SLEEP"), {
         font: "20px Arial",
         color: "#ffffff",
         align: "center",
@@ -918,7 +923,7 @@ loadState(state) {
 
     // Create 'Yes' button
     const yesButton = this.add
-      .text(centerX - 50, centerY + 30, "Yes", {
+      .text(centerX - 50, centerY + 30, t("YES"), {
         font: "18px Arial",
         color: "#00ff00",
         backgroundColor: "#000000",
@@ -934,7 +939,7 @@ loadState(state) {
 
     // Create 'No' button
     const noButton = this.add
-      .text(centerX + 50, centerY + 30, "No", {
+      .text(centerX + 50, centerY + 30, t("NO"), {
         font: "18px Arial",
         color: "#ff0000",
         backgroundColor: "#000000",
