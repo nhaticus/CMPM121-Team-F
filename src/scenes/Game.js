@@ -8,6 +8,8 @@ class Game extends Phaser.Scene {
     this.availablePlants = [];
     this.harvestedPlantTypes = new Set(); // Track harvested plant types
     this.activeSaveSlot = 1; // Default to Slot 1
+    this.dayManager = new Day(); 
+
     
   }
 
@@ -65,7 +67,8 @@ class Game extends Phaser.Scene {
     });
 
     /* day */
-    this.day = parseInt(localStorage.getItem('day')) || 1;
+    this.dayManager = new Day();
+    this.dayManager.loadDay(); 
     this.showDay();
 
     /*  house */
@@ -150,7 +153,6 @@ class Game extends Phaser.Scene {
         const { day, plants } = JSON.parse(savedData);
 
         console.log("Day restored:", day);
-        this.day = day || 1;
         this.showDay();
 
         if (!this.plantGrid) {
@@ -210,7 +212,6 @@ saveGameSlot(slot) {
   console.log(`Saving game to slot ${slot}...`);
 
   const gameState = {
-      day: this.day,
       plants: this.plantGrid.getGrid().map((plant, index) => {
           if (plant) {
               console.log(`Saving plant at grid index ${index}:`, plant);
@@ -701,17 +702,16 @@ loadState(state) {
   }
   showDay() {
     if (this.dayText) {
-      this.dayText.setText(`Day: ${this.day}`);
+      this.dayText.setText(`Day: ${this.dayManager.getCurrentDay()}`);
     } else {
-      // Create the day text for the first time
       this.dayText = this.add
-        .text(10, 10, `Day: ${this.day}`, {
+        .text(10, 10, `Day: ${this.dayManager.getCurrentDay()}`, {
           font: "18px Arial",
           color: "#ffffff",
           backgroundColor: "#000000",
           padding: { x: 5, y: 5 },
         })
-        .setScrollFactor(0) // Fix the text to the camera view
+        .setScrollFactor(0)
         .setDepth(200);
     }
   }
@@ -776,24 +776,22 @@ loadState(state) {
   }
 
   newDay() {
-    // Save the current state before progressing
     console.log("Starting a new day...");
-    this.saveState("progressDay", { day: this.day });
-
-    // Increment the day
-    this.day++;
-    console.log("Incremented day:", this.day);
-    localStorage.setItem("day", this.day);
-
-    // Save grid state to localStorage
+    this.saveState("progressDay", { day: this.dayManager.getCurrentDay() });
+  
+    // Increment and save the day
+    this.dayManager.incrementDay();
+    this.dayManager.saveDay();
+  
+    // Save grid state
     const gridState = this.plantGrid.getGrid();
     console.log("Grid state before saving to localStorage:", gridState);
     localStorage.setItem("gridState", JSON.stringify(gridState));
-
-    // Update plant requirements and display the day
+  
+    // Update plant requirements and display the new day
     this.checkPlantReq();
     this.showDay();
-}
+  }
 
 checkPlantReq() {
   this.plants.getChildren().forEach((plant) => {
