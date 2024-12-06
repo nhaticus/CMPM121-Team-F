@@ -254,26 +254,26 @@ class Game extends Phaser.Scene {
   }
 
   harvestPlant(plant) {
-    console.log(`Attempting to harvest plant with type: ${plant.plantType}`); // Debugging log
+    console.log(`Attempting to harvest plant with type: ${plant.plantType}`);
 
     // Save the state before destroying the plant
     this.saveState("harvest", {
-      x: plant.x,
-      y: plant.y,
-      harvestedPlant: {
         x: plant.x,
         y: plant.y,
-        plantType: plant.plantType, // Save the type
-        days: plant.days,
-        water: plant.water,
-        sun: plant.sun,
-        level: plant.level,
-      },
+        harvestedPlant: {
+            x: plant.x,
+            y: plant.y,
+            plantType: plant.plantType, // Save the type
+            days: plant.days,
+            water: plant.water,
+            sun: plant.sun,
+            level: plant.level, // Save the level explicitly
+        },
     });
 
     plant.destroy();
-    console.log(`Plant at (${plant.x}, ${plant.y}) harvested.`);
-  }
+    console.log(`${plant.plantType} at (${plant.x}, ${plant.y}) harvested.`);
+}
 
 
   showCompletionPopup() {
@@ -380,17 +380,48 @@ class Game extends Phaser.Scene {
             case "harvest":
                 console.log("Undoing Harvest Action");
                 const harvestedPlant = lastState.payload.harvestedPlant;
+
+                // Restore the harvested plant
                 const restoredPlant = new Plant(
                     this,
                     harvestedPlant.x,
                     harvestedPlant.y,
                     "plant"
                 );
-                Object.assign(restoredPlant, harvestedPlant); // Restore all properties
+
+                // Restore all plant properties
+                restoredPlant.plantType = harvestedPlant.plantType;
+                restoredPlant.days = harvestedPlant.days;
+                restoredPlant.water = harvestedPlant.water;
+                restoredPlant.sun = harvestedPlant.sun;
+                restoredPlant.level = harvestedPlant.level;
+
+                // Set the correct sprite frame based on plant type and level
+                switch (restoredPlant.plantType) {
+                    case "wheat":
+                        restoredPlant.setFrame(1 + restoredPlant.level);
+                        break;
+                    case "plum":
+                        restoredPlant.setFrame(7 + restoredPlant.level);
+                        break;
+                    case "tomato":
+                        restoredPlant.setFrame(13 + restoredPlant.level);
+                        break;
+                    default:
+                        console.error(
+                            `Unknown plant type during undo: ${restoredPlant.plantType}`
+                        );
+                }
+
+                // Reattach interactivity
                 restoredPlant.setInteractive().on("pointerdown", () => {
                     restoredPlant.showPlantInfoPopup(this);
                 });
+
                 this.plants.add(restoredPlant);
+                console.log(
+                    `Plant restored at (${restoredPlant.x}, ${restoredPlant.y}) with type ${restoredPlant.plantType} and level ${restoredPlant.level}`
+                );
                 break;
 
             case "progressDay":
@@ -412,7 +443,7 @@ class Game extends Phaser.Scene {
 }
 
 
-  
+
 redoAction() {
   console.log("Redo Action Triggered");
   if (this.redoStack.length > 0) {
@@ -420,22 +451,52 @@ redoAction() {
       this.undoStack.push(nextState);
 
       switch (nextState.actionType) {
-          case "plant":
-              console.log("Redoing Plant Action");
-              const plant = new Plant(
-                  this,
-                  nextState.payload.x,
-                  nextState.payload.y,
-                  "plant"
-              );
+        case "plant":
+          console.log("Redoing Plant Action");
 
-              // Restore interactivity
-              plant.setInteractive().on("pointerdown", () => {
-                  plant.showPlantInfoPopup(this);
-              });
+          const plantData = nextState.payload;
 
-              this.plants.add(plant);
-              break;
+          // Create a new plant at the saved position
+          const redonePlant = new Plant(
+              this,
+              plantData.x,
+              plantData.y,
+              "plant"
+          );
+
+          // Restore all plant properties
+          Object.assign(redonePlant, {
+              level: plantData.level,
+              days: plantData.days,
+              water: plantData.water,
+              sun: plantData.sun,
+              plantType: plantData.plantType,
+          });
+
+          console.log("Plant restored during redo:", plantData);
+
+          // Set the correct sprite frame based on type and level
+          switch (redonePlant.plantType) {
+              case "wheat":
+                  redonePlant.setFrame(1 + redonePlant.level); // Adjust frame for wheat
+                  break;
+              case "plum":
+                  redonePlant.setFrame(7 + redonePlant.level); // Adjust frame for plum
+                  break;
+              case "tomato":
+                  redonePlant.setFrame(13 + redonePlant.level); // Adjust frame for tomato
+                  break;
+              default:
+                  console.error("Unknown plant type for frame restoration:", redonePlant.plantType);
+          }
+
+          // Reattach interactivity
+          redonePlant.setInteractive().on("pointerdown", () => {
+              redonePlant.showPlantInfoPopup(this);
+          });
+
+          this.plants.add(redonePlant);
+          break;
 
           case "water":
               console.log("Redoing Water Action");
@@ -445,27 +506,29 @@ redoAction() {
                       plant.y === nextState.payload.y
               );
               if (plantToWater) {
-                  plantToWater.water = nextState.payload.newWater; // Apply new water level
+                  plantToWater.water = nextState.payload.newWater; // Apply water level
               }
               break;
 
           case "harvest":
               console.log("Redoing Harvest Action");
               const harvestedPlant = nextState.payload.harvestedPlant;
-              const restoredPlant = new Plant(
-                  this,
-                  harvestedPlant.x,
-                  harvestedPlant.y,
-                  "plant"
+
+              // Find and remove the plant again
+              const plantToRemove = this.plants.getChildren().find(
+                  (p) => p.x === harvestedPlant.x && p.y === harvestedPlant.y
               );
-              Object.assign(restoredPlant, harvestedPlant);
 
-              // Restore interactivity
-              restoredPlant.setInteractive().on("pointerdown", () => {
-                  restoredPlant.showPlantInfoPopup(this);
-              });
-
-              this.plants.add(restoredPlant);
+              if (plantToRemove) {
+                  plantToRemove.destroy();
+                  console.log(
+                      `Plant at (${harvestedPlant.x}, ${harvestedPlant.y}) harvested again.`
+                  );
+              } else {
+                  console.error(
+                      `Redo failed: No plant found at (${harvestedPlant.x}, ${harvestedPlant.y})`
+                  );
+              }
               break;
 
           case "progressDay":
@@ -490,18 +553,31 @@ redoAction() {
 
 
 
-
-
 saveState(actionType, payload) {
   const state = {
-    actionType, // e.g., "plant", "water", "harvest"
-    payload,
-    day: this.day,
+      actionType,   // Type of action (e.g., "plant", "water", "progressDay")
+      payload,      // Action-specific payload (e.g., plant details)
+      day: this.day, // Current day
   };
-  console.log("Saving State:", actionType, state); // Debugging
+
+  // If action involves plants, save plant-specific data
+  if (actionType === "plant") {
+      state.payload = {
+          x: payload.x,
+          y: payload.y,
+          level: payload.level,
+          days: payload.days,
+          water: payload.water,
+          sun: payload.sun,
+          plantType: payload.plantType, // Save plantType explicitly
+      };
+  }
+
+  console.log("Saving State:", JSON.stringify(state, null, 2)); // Debug log
   this.undoStack.push(state);
   this.redoStack = []; // Clear redo stack on new action
 }
+
 
 loadState(state) {
   console.log("Loading State:", state);
@@ -718,27 +794,47 @@ loadState(state) {
 addPlant(x, y, texture, level = 0) {
   const plant = new Plant(this, x, y, texture);
 
-  // Set the initial level of the plant
+  // Assign initial plant stats
   plant.level = level;
+  plant.plantType = ["wheat", "plum", "tomato"][Phaser.Math.Between(0, 2)]; // Random type
+  plant.days = 0;
+  plant.water = 0;
+  plant.sun = 0;
 
-  // Set the correct sprite frame for the level
-  plant.setFrame(level * 6 + 1); // Assuming the frame index depends on level
+  // Set sprite frame based on type and level
+  switch (plant.plantType) {
+      case "wheat":
+          plant.setFrame(1 + plant.level);
+          break;
+      case "plum":
+          plant.setFrame(7 + plant.level);
+          break;
+      case "tomato":
+          plant.setFrame(13 + plant.level);
+          break;
+  }
 
-  // Add interactivity and popup logic
+  // Attach popup interactivity
   plant.setInteractive().on("pointerdown", () => {
       plant.showPlantInfoPopup(this);
   });
 
-  // Save the planting action
-  this.saveState("plant", { x: plant.x, y: plant.y });
+  // Save plant addition as an action
+  this.saveState("plant", {
+      x: plant.x,
+      y: plant.y,
+      level: plant.level,
+      days: plant.days,
+      water: plant.water,
+      sun: plant.sun,
+      plantType: plant.plantType,
+  });
 
-  this.plantGrid.setPlant(x, y, plant);
   this.plants.add(plant);
-
-  console.log(this.plantGrid);
 
   return plant;
 }
+
 
 
 getPlant(x, y) {
