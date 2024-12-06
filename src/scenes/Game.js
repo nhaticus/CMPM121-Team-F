@@ -558,7 +558,17 @@ saveState(actionType, payload) {
       actionType,   // Type of action (e.g., "plant", "water", "progressDay")
       payload,      // Action-specific payload (e.g., plant details)
       day: this.day, // Current day
-  };
+      plants: this.plants.getChildren().map((plant) => ({
+        x: plant.x,
+        y: plant.y,
+        level: plant.level,
+        plantType: plant.plantType,
+        days: plant.days,
+        water: plant.water,
+        sun: plant.sun,
+    })),
+  
+    };
 
   // If action involves plants, save plant-specific data
   if (actionType === "plant") {
@@ -588,19 +598,40 @@ loadState(state) {
 
   // Restore plants
   this.plants.clear(true, true); // Remove all current plants
-  state.plants.forEach((plantData) => {
-      const plant = new Plant(this, plantData.x, plantData.y, "plant");
-      Object.assign(plant, plantData); // Restore plant properties
-      plant.setFrame(plant.level * 6 + 1); // Set correct sprite frame for plant
-      this.plants.add(plant);
+  if (state.plants && Array.isArray(state.plants)) {
+      state.plants.forEach((plantData) => {
+          const plant = new Plant(this, plantData.x, plantData.y, "plant");
+          Object.assign(plant, plantData); // Restore plant properties
+          
+          // Set the correct sprite frame based on type and level
+          switch (plant.plantType) {
+              case "wheat":
+                  plant.setFrame(1 + plant.level);
+                  break;
+              case "plum":
+                  plant.setFrame(7 + plant.level);
+                  break;
+              case "tomato":
+                  plant.setFrame(13 + plant.level);
+                  break;
+              default:
+                  console.error(`Unknown plant type: ${plant.plantType}`);
+          }
 
-      // Reapply interactivity
-      plant.setInteractive().on("pointerdown", () => {
-          plant.showPlantInfoPopup(this);
+          // Reapply interactivity
+          plant.setInteractive().on("pointerdown", () => {
+              plant.showPlantInfoPopup(this);
+          });
+
+          this.plants.add(plant);
       });
-  });
+  } else {
+      console.error("No plants data found in state.");
+  }
+
   console.log("State Loaded: Day and Plants Restored");
 }
+
 
 
 
