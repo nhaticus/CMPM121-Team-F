@@ -251,7 +251,103 @@ class Game extends Phaser.Scene {
       .on("pointerdown", () => {
         this.saveGame(); // Add functionality to save the game
       });
+
+      /* quit button  */
+      const quitButton = this.add
+        .image(
+          this.cameras.main.width - 50, 
+          this.cameras.main.height - 20, 
+          "QuitButton"
+        )
+        .setOrigin(0.5)
+        .setScrollFactor(0)
+        .setInteractive()
+        .setDisplaySize(64, 32)
+        .on("pointerdown", () => {
+            this.showQuitPopup();
+        });
   }
+
+  // Show Quit Popup
+showQuitPopup() {
+  // Pause the game
+  this.physics.pause();
+
+  // Get the camera's center
+  const centerX = this.cameras.main.midPoint.x;
+  const centerY = this.cameras.main.midPoint.y;
+
+  // Create a background overlay for the popup
+  const overlay = this.add
+      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
+      .setOrigin(0.5)
+      .setDepth(100);
+
+  // Add popup text
+  const popupText = this.add
+      .text(centerX, centerY - 60, "Select a Save Slot.", {
+          font: "18px Arial",
+          color: "#ffffff",
+          align: "center",
+      })
+      .setOrigin(0.5)
+      .setDepth(101);
+
+      // Create Save 1 button
+    const save1Button = this.add
+    .text(centerX, centerY - 30, "Save 1", {
+        font: "16px Arial",
+        color: "#ffffff",
+        backgroundColor: "#000000",
+        padding: { x: 10, y: 5 },
+    })
+    .setInteractive()
+    .setOrigin(0.5)
+    .setDepth(102)
+    .on("pointerdown", () => {
+        this.saveGameSlot(1);
+        this.closePopup(overlay, popupTitle, save1Button, save2Button, save3Button);
+    });
+
+// Create Save 2 button
+const save2Button = this.add
+    .text(centerX, centerY + 10, "Save 2", {
+        font: "16px Arial",
+        color: "#ffffff",
+        backgroundColor: "#000000",
+        padding: { x: 10, y: 5 },
+    })
+    .setInteractive()
+    .setOrigin(0.5)
+    .setDepth(102)
+    .on("pointerdown", () => {
+        this.saveGameSlot(2);
+        this.closePopup(overlay, popupTitle, save1Button, save2Button, save3Button);
+    });
+
+// Create Save 3 button
+const save3Button = this.add
+    .text(centerX, centerY + 50, "Save 3", {
+        font: "16px Arial",
+        color: "#ffffff",
+        backgroundColor: "#000000",
+        padding: { x: 10, y: 5 },
+    })
+    .setInteractive()
+    .setOrigin(0.5)
+    .setDepth(102)
+    .on("pointerdown", () => {
+        this.saveGameSlot(3);
+        this.closePopup(overlay, popupTitle, save1Button, save2Button, save3Button);
+    });
+    }
+    
+
+    // Quit Game
+quitGame() {
+  console.log("Game exited");
+  // Logic to quit the game (e.g., redirect to the main menu or close the app)
+}
 
   harvestPlant(plant) {
     console.log(`Attempting to harvest plant with type: ${plant.plantType}`);
