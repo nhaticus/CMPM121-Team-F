@@ -860,34 +860,9 @@ loadState(state) {
 }
 
 checkPlantReq() {
-  const surroundingTiles = [
-    { x: -1, y: -1 },
-    { x: 0, y: -1 },
-    { x: 1, y: -1 },
-    { x: -1, y: 0 },
-    { x: 1, y: 0 },
-    { x: -1, y: 1 },
-    { x: 0, y: 1 },
-    { x: 1, y: 1 },
-  ];
   this.plants.getChildren().forEach((plant) => {
-    let surroundingPlants = 0;
-
-    surroundingTiles.forEach((offset) => {
-      const tileX = plant.x + offset.x * 16;
-      const tileY = plant.y + offset.y * 16;
-      const tile = this.tiledGroundLayer.getTileAtWorldXY(tileX, tileY);
-
-      if (tile) {
-        // console.log(`Tile found at (${tileX}, ${tileY})`);
-        if (this.plantCheck(tile)) {
-          surroundingPlants++;
-        }
-      }
-    });
-
-    /* calls a function that will check if the surrounding plants matches with required plants */
-    plant.newDay(surroundingPlants);
+    const neighbors = this.plantGrid.getNeighbors(plant.x, plant.y).length;
+    plant.newDay(neighbors); // Pass neighbor count to the plant
   });
 }
 
@@ -939,35 +914,17 @@ plantCheck(currentTile) {
 }
 
 addPlant(x, y, texture, level = 0) {
-  // Define plant data
-  const plantData = {
-    x, 
-    y, 
-    level, 
-    water: 0, 
-    sun: 0, 
-    plantType: null, 
-    frameIndex: 0 // Default frame index
-  };
-
-  // Create the plant using a factory method in Plant.js
+  const plantData = { x, y, level, water: 0, sun: 0, plantType: null, frameIndex: 0 };
   const plant = Plant.createFromData(this, plantData);
 
-  // Assign a type from the available plants (using setPlantTypes)
   plant.setPlantTypes(this.availablePlants);
-
-  // Add interactivity
   plant.setInteractive().on("pointerdown", () => {
     plant.showPlantInfoPopup(this);
   });
 
-  // Add plant to the group and grid
-  this.plants.add(plant);
-  this.plantGrid.setPlant(x, y, plant);
-
-  // Save game after adding a plant
-  this.saveGameSlot(this.activeSaveSlot);
-
+  this.plants.add(plant); // Add to Phaser group
+  this.plantGrid.addPlant(x, y, plant); // Add to grid using PlantGrid
+  this.saveGameSlot(this.activeSaveSlot); // Save game state
   return plant;
 }
 
