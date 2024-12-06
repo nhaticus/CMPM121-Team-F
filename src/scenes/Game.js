@@ -20,8 +20,8 @@ class Game extends Phaser.Scene {
     // Initialize the game based on the active save slot
     this.loadGameSlot(this.activeSaveSlot);
 
-    /* map */
-    this.mapOBJ = new GameStart(this);
+    /* Initialize Map & Player */
+    startGame(this);
 
     /* Initialize PlantGrid */
     const gridWidth = 10;
