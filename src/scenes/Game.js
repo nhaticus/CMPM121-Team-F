@@ -1,5 +1,3 @@
-//import { t, setLanguage } from '../utils/localization.js'; // Adjust the path as needed
-
 class Game extends Phaser.Scene {
   constructor() {
     super("gameScene");
@@ -20,54 +18,8 @@ class Game extends Phaser.Scene {
     this.loadGameSlot(this.activeSaveSlot);
 
     /* map */
-    const map = this.add.tilemap("mapJSON");
-    const tiledGround = map.addTilesetImage("TiledGround", "tiledGroundTiles");
-    const water = map.addTilesetImage("Water", "waterTiles");
-    const decor = map.addTilesetImage("Decor", "decorTiles");
-    const fences = map.addTilesetImage("Fences", "fencesTiles");
-    const tree = map.addTilesetImage("Tree", "treeTiles");
-    const farmTiles = map.addTilesetImage("FarmTiles", "farmTiles");
-    const grass = map.addTilesetImage("Grass", "grassTiles");
+    this.mapOBJ = new GameStart(this);
 
-    /*  layers  */
-    this.groundLayer = map.createLayer(
-      "Grass-n-Paths",
-      [grass, farmTiles],
-      0,
-      0
-    );
-    this.houseLayer = map.createLayer("House", farmTiles, 0, 0);
-    this.decorLayer = map.createLayer("Decor", [decor, fences, tree], 0, 0);
-    this.waterLayer = map.createLayer("Water", water, 0, 0);
-    this.tiledGroundLayer = map.createLayer("Tiled Ground", tiledGround, 0, 0);
-    /* layers */
-    const groundLayer = map.createLayer(
-      "Grass-n-Paths",
-      [grass, farmTiles],
-      0,
-      0
-    );
-    const houseLayer = map.createLayer("House", farmTiles, 0, 0);
-    const decorLayer = map.createLayer("Decor", [decor, fences, tree], 0, 0);
-    const waterLayer = map.createLayer("Water", water, 0, 0);
-    const tiledGroundLayer = map.createLayer("Tiled Ground", tiledGround, 0, 0);
-
-    /*  player  */
-    this.player = new Player(this, 500, 500, "player", 0);
-    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
-    /*  collisions  */
-    this.waterLayer.setCollisionByExclusion([-1]);
-    this.physics.add.collider(this.player, this.waterLayer);
-
-    this.houseLayer.setCollisionByExclusion([-1]);
-    this.physics.add.collider(this.player, this.houseLayer);
-
-    this.decorLayer.setCollisionByExclusion([-1]);
-    this.physics.add.collider(this.player, this.decorLayer);
-    this.plants = this.add.group();
-
-    
     /* Initialize PlantGrid */
     const gridWidth = 10;
     const gridHeight = 10;
@@ -91,7 +43,7 @@ class Game extends Phaser.Scene {
     
     /*  camera  */
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
     /*  controls  */
     this.cursors = this.input.keyboard.createCursorKeys();
