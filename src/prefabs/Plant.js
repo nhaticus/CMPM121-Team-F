@@ -109,7 +109,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
         "%\n" + t("WATER_LEVEL") + this.water +
           "%\n" + t("CURRENT_SUNLIGHT") + this.sun +
           "%\n" + t("REQUIREMENTS") + this.requirements +
-          "\n" + t(PLANT_LEVEL) + this.level,
+          "\n" + t("PLANT_LEVEL") + this.level,
         {
           font: "14px Arial",
           color: "#ffffff",

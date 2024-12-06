@@ -350,14 +350,7 @@ class Game extends Phaser.Scene {
         console.log(`No saved data found for slot ${slot}. Starting a new game.`);
         this.startNewGameState(slot);
     }
-}
-
-
-
-
-
-  
-  
+} 
   
 saveGameSlot(slot) {
   console.log(`Saving game to slot ${slot}...`);
@@ -384,12 +377,6 @@ saveGameSlot(slot) {
   localStorage.setItem(`gameStateSlot${slot}`, JSON.stringify(gameState));
   console.log(`Game saved to slot ${slot}:`, gameState);
 }
-
-
-
-
-
-
 
   // Show Quit Popup
   showQuitPopup() {
@@ -477,9 +464,7 @@ saveGameSlot(slot) {
     // Destroy all elements passed to the function
     elements.forEach((element) => element.destroy());
     this.physics.resume(); // Resume the game after closing the popup
-  }
-  
-    
+  } 
 
     // Quit Game
 quitGame() {
@@ -793,9 +778,6 @@ redoAction() {
   }
 }
 
-
-
-
 saveState(actionType, payload) {
   const state = {
       actionType,   // Type of action (e.g., "plant", "water", "progressDay")
@@ -830,7 +812,6 @@ saveState(actionType, payload) {
   this.undoStack.push(state);
   this.redoStack = []; // Clear redo stack on new action
 }
-
 
 loadState(state) {
   console.log("Loading State:", state);
@@ -876,16 +857,12 @@ loadState(state) {
   console.log("State Loaded: Day and Plants Restored");
 }
 
-
-
-
   restartGameData(){
     localStorage.setItem('day', null);
     localStorage.setItem('plants', null);
     localStorage.setItem('gridState', null);
     localStorage.clear();
   }
-
 
   onPressed(content) {
 
@@ -993,10 +970,6 @@ loadState(state) {
     this.showDay();
 }
 
-
-
-
-
   checkPlantReq() {
     const surroundingTiles = [
       { x: -1, y: -1 },
@@ -1076,7 +1049,6 @@ loadState(state) {
     }
 }
 
-
 addPlant(x, y, texture, level = 0) {
   const plant = new Plant(this, x, y, texture);
   plant.setPlantTypes(this.availablePlants);
@@ -1108,10 +1080,6 @@ addPlant(x, y, texture, level = 0) {
   this.saveGameSlot(this.activeSaveSlot);
   return plant;
 }
-
-
-
-
 
 getPlant(x, y) {
   return this.plantGrid.getPlant(x, y);
