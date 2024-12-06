@@ -270,6 +270,15 @@ class Game extends Phaser.Scene {
             level: plant.level, // Save the level explicitly
         },
     });
+    // Add plant type to harvested set
+    this.harvestedPlantTypes.add(plant.plantType);
+    console.log("Harvested Plant Types:", Array.from(this.harvestedPlantTypes));
+
+    // Check if all plant types have been harvested
+    const allPlantTypes = ["wheat", "plum", "tomato"]; // Define all possible plant types
+    if (allPlantTypes.every(type => this.harvestedPlantTypes.has(type))) {
+        this.showCompletionPopup();
+    }
 
     plant.destroy();
     console.log(`${plant.plantType} at (${plant.x}, ${plant.y}) harvested.`);
