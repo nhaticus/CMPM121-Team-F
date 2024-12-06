@@ -257,12 +257,12 @@ class Game extends Phaser.Scene {
         .image(
           this.cameras.main.width - 50, 
           this.cameras.main.height - 20, 
-          "QuitButton"
+          "PauseButton"
         )
         .setOrigin(0.5)
         .setScrollFactor(0)
         .setInteractive()
-        .setDisplaySize(64, 32)
+        .setDisplaySize(24, 24)
         .on("pointerdown", () => {
             this.showQuitPopup();
         });

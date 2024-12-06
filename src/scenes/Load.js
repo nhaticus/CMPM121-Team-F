@@ -19,7 +19,7 @@ class Load extends Phaser.Scene {
      this.load.image('RedoButton', 'tilesets/RedoButton.png');
      this.load.image("SaveButton", "tilesets/save.png");
      this.load.image('RestartButton', 'tilesets/RestartButton.png');
-     this.load.image("QuitButton", "tilesets/QuitButton.png");
+     this.load.image("PauseButton", "tilesets/PauseButton.png");
 
     this.load.tilemapTiledJSON("mapJSON", "map.json");
 
