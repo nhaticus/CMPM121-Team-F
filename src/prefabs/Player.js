@@ -12,8 +12,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.setDepth(1);
 
-    playerDirection = "down";
-    playerSpeed = 100;
+    this.playerDirection = "down";
+    this.playerSpeed = 100;
   }
 
   update(cursors, scene) {
@@ -22,35 +22,35 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     /* basic movement */
     if (cursors.left.isDown || scene.input.keyboard.addKey("A").isDown) {
       playerVector.x = -1;
-      playerDirection = "left";
+      this.playerDirection = "left";
       this.flipX = true;
     } else if (
       cursors.right.isDown ||
       scene.input.keyboard.addKey("D").isDown
     ) {
       playerVector.x = 1;
-      playerDirection = "right";
+      this.playerDirection = "right";
       this.flipX = false;
     }
 
     if (cursors.up.isDown || scene.input.keyboard.addKey("W").isDown) {
       playerVector.y = -1;
-      playerDirection = "up";
+      this.playerDirection = "up";
     } else if (cursors.down.isDown || scene.input.keyboard.addKey("S").isDown) {
       playerVector.y = 1;
-      playerDirection = "down";
+      this.playerDirection = "down";
     }
 
     playerVector.normalize();
     let playerMovement;
 
     this.setVelocity(
-      playerVector.x * playerSpeed,
-      playerVector.y * playerSpeed
+      playerVector.x * this.playerSpeed,
+      playerVector.y * this.playerSpeed
     );
     playerVector.length()
       ? (playerMovement = "run")
       : (playerMovement = "idle");
-    this.play(playerMovement + "-" + playerDirection, true);
+    this.play(playerMovement + "-" + this.playerDirection, true);
   }
 }
