@@ -663,24 +663,44 @@ loadState(state) {
         this.player.y
     );
 
-    if (
-        tile &&
-        Phaser.Input.Keyboard.JustDown(
-            this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
-        )
-    ) {
-        if (this.plantCheck(tile)) {
-            return;
+    if (tile) {
+        if (
+            Phaser.Input.Keyboard.JustDown(
+                this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
+            )
+        ) {
+            // Fully grown plant (level 3)
+            if (!this.plantCheck(tile)) {
+                this.addPlant(tile.getCenterX(), tile.getCenterY(), "plant", 3);
+            }
         }
-        const plant = this.addPlant( tile.getCenterX(), tile.getCenterY(), "plant");
+
+        if (
+            Phaser.Input.Keyboard.JustDown(
+                this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+            )
+        ) {
+            // Freshly planted seed (level 0)
+            if (!this.plantCheck(tile)) {
+                this.addPlant(tile.getCenterX(), tile.getCenterY(), "plant", 0);
+            }
+        }
     }
 }
 
-addPlant(x, y, texture) {
+
+addPlant(x, y, texture, level = 0) {
   const plant = new Plant(this, x, y, texture);
-  plant.fullyGrowPlant();
+
+  // Set the initial level of the plant
+  plant.level = level;
+
+  // Set the correct sprite frame for the level
+  plant.setFrame(level * 6 + 1); // Assuming the frame index depends on level
+
+  // Add interactivity and popup logic
   plant.setInteractive().on("pointerdown", () => {
-    plant.showPlantInfoPopup(this);
+      plant.showPlantInfoPopup(this);
   });
 
   // Save the planting action
@@ -689,10 +709,11 @@ addPlant(x, y, texture) {
   this.plantGrid.setPlant(x, y, plant);
   this.plants.add(plant);
 
-  console.log(this.plantGrid)
+  console.log(this.plantGrid);
 
-  return plant
+  return plant;
 }
+
 
 getPlant(x, y) {
   return this.plantGrid.getPlant(x, y);
