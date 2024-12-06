@@ -4,13 +4,11 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   
     scene.add.existing(this);
     scene.physics.world.enable(this);
-  
+    
     this.setOrigin(0.5);
   
     /* Randomize plant type */
-    this.setPlantType(Phaser.Math.Between(1, 3));
-  
-    console.log(`Plant created with type: ${this.plantType}`); // Debug during creation
+
   
     /* Some global variables */
     this.neightbor = 0;
@@ -22,7 +20,22 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   
     this.requirements = "";
   
-    this.requirementsGenerator();
+
+  }
+
+  setPlantTypes(availablePlants){
+    console.log(availablePlants);
+    const thisPlant = availablePlants[Phaser.Math.Between(0, availablePlants.length - 1)];
+
+    this.plantType = thisPlant[0];
+    console.log("PLANT TYPE" + this.plantType);
+
+    console.log("Assigned plant type:", this.plantType); // Log assigned type
+
+    this.setFrame(thisPlant[1]);
+
+    this.requirementsGenerator(thisPlant[2]);
+    
   }
 
   /*  WHEAT SPRITESHEET INDEXES
@@ -61,7 +74,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
             this.plantType = ""; // Default case for safety
             break;
         }
-        console.log("Assigned plant type:", this.plantType); // Log assigned type
+
       }
 
   grow() {
@@ -193,12 +206,26 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.physics.resume();
   }
 
-  requirementsGenerator() {
-    this.waterReq = Phaser.Math.Between(5, 20) * 5;
-    this.sunReq = Phaser.Math.Between(5, 20) * 5;
-
-    if (this.level === 0) {
-      this.neighborReq = Phaser.Math.Between(2, 8);
+  requirementsGenerator(reqs) {
+    if(reqs.includes("sun")){
+      this.sunReq = Phaser.Math.Between(5, 20) * 5;
+    }
+    else{
+      this.sunReq = 0;
+    }
+    if(reqs.includes("water")){
+      this.waterReq = Phaser.Math.Between(5, 20) * 5;
+    }
+    else{
+      this.waterReq = 0;
+    }
+    if(reqs.includes("neighbor")){
+      if (this.level === 0) {
+        this.neighborReq = Phaser.Math.Between(2, 8);
+      }
+    }
+    else{
+      this.neighborReq = 0;
     }
     this.requirements = `\nWater: ${this.waterReq}% \nSurrounding Plants: ${this.neighborReq} \n Sunlight: ${this.sunReq}`;
   }

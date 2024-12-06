@@ -1,4 +1,4 @@
-import { t, setLanguage } from '../utils/localization.js'; // Adjust the path as needed
+//import { t, setLanguage } from '../utils/localization.js'; // Adjust the path as needed
 
 class Game extends Phaser.Scene {
   constructor() {
@@ -6,8 +6,10 @@ class Game extends Phaser.Scene {
     this.undoStack = [];
     this.redoStack = [];
     this.plantGrid = null;
+    this.availablePlants = [];
     this.harvestedPlantTypes = new Set(); // Track harvested plant types
     this.activeSaveSlot = 1; // Default to Slot 1
+    
   }
 
   create() {
@@ -276,6 +278,13 @@ class Game extends Phaser.Scene {
             this.showQuitPopup();
             this.saveGameSlot(this.activeSaveSlot); // Save to active slot
         });
+
+
+        
+    //create plants with different requirements (Must have frame in order in spritesheets);
+    this.createPlant("wheat", 1, ['sun', 'water', 'neighbor']);
+    this.createPlant("plum", 7, ["sun", 'neighbor']);
+    this.createPlant("tomato", 13, ["water"]);
   }
 
   loadGameSlot(slot) {
@@ -835,6 +844,7 @@ loadState(state) {
   if (state.plants && Array.isArray(state.plants)) {
       state.plants.forEach((plantData) => {
           const plant = new Plant(this, plantData.x, plantData.y, "plant");
+          plant.setPlantTypes(this.availablePlants);
           Object.assign(plant, plantData); // Restore plant properties
           
           // Set the correct sprite frame based on type and level
@@ -879,6 +889,12 @@ loadState(state) {
 
   onPressed(content) {
 
+  }
+
+  createPlant(type, frame, reqs){
+    const newPlant = [type, frame, reqs];
+    this.availablePlants.push(newPlant);
+    console.log(this.availablePlants);
   }
 
   showDay() {
@@ -1063,8 +1079,8 @@ loadState(state) {
 
 addPlant(x, y, texture, level = 0) {
   const plant = new Plant(this, x, y, texture);
+  plant.setPlantTypes(this.availablePlants);
   plant.level = level;
-  plant.plantType = ["wheat", "plum", "tomato"][Phaser.Math.Between(0, 2)];
   plant.days = 0;
   plant.water = 0;
   plant.sun = 0;
