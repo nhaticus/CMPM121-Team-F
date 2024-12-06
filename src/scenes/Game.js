@@ -775,7 +775,7 @@ loadState(state) {
   }
 
   onPressed(content) {
-
+    console.log(content);
   }
 
   createPlant(type, frame, reqs){
