@@ -1,4 +1,5 @@
 class Game extends Phaser.Scene {
+  
   constructor() {
     super("gameScene");
     this.undoStack = [];
@@ -11,6 +12,8 @@ class Game extends Phaser.Scene {
   }
 
   create() {
+    testFunction();
+    console.log(testVar);
     
     setLanguage("en");
 
@@ -70,101 +73,8 @@ class Game extends Phaser.Scene {
     /*  house */
     this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
 
-    /* inventory */
+    inventorySetup(this);
 
-    let inventory = [];
-
-
-    const inventorybutton = new Inventory({
-      scene: this,
-      key: "inventory",
-      up: 0,
-      down: 1,
-      over: 1,
-      x: 150,
-      y: 280,
-    });
-    inventorybutton.on("pointerdown", this.onPressed, this);
-
-    inventory.push(inventorybutton);
-
-    const inventorybutton2 = new Inventory({
-      scene: this,
-      key: "inventory",
-      up: 0,
-      down: 1,
-      over: 1,
-      x: 182,
-      y: 280,
-    });
-    inventorybutton2.on("pointerdown", this.onPressed, this);
-
-    inventory.push(inventorybutton2);
-
-    const inventorybutton3 = new Inventory({
-      scene: this,
-      key: "inventory",
-      up: 0,
-      down: 1,
-      over: 1,
-      x: 214,
-      y: 280,
-    });
-    inventorybutton3.on("pointerdown", this.onPressed, this);
-
-    inventory.push(inventorybutton3);
-
-    const inventorybutton4 = new Inventory({
-      scene: this,
-      key: "inventory",
-      up: 0,
-      down: 1,
-      over: 1,
-      x: 246,
-      y: 280,
-    });
-    inventorybutton4.on("pointerdown", this.onPressed, this);
-
-    inventory.push(inventorybutton4);
-
-    const inventorybutton5 = new Inventory({
-      scene: this,
-      key: "inventory",
-      up: 0,
-      down: 1,
-      over: 1,
-      x: 278,
-      y: 280,
-    });
-    inventorybutton5.on("pointerdown", this.onPressed, this);
-
-    inventory.push(inventorybutton5);
-
-    const inventorybutton6 = new Inventory({
-      scene: this,
-      key: "inventory",
-      up: 0,
-      down: 1,
-      over: 1,
-      x: 310,
-      y: 280,
-    });
-    inventorybutton6.on("pointerdown", this.onPressed, this);
-
-    inventory.push(inventorybutton6);
-
-    const inventorybutton7 = new Inventory({
-      scene: this,
-      key: "inventory",
-      up: 0,
-      down: 1,
-      over: 1,
-      x: 342,
-      y: 280,
-    });
-    inventorybutton7.on("pointerdown", this.onPressed, this);
-
-    inventory.push(inventorybutton7);
 
 
     /* undo & redo buttons */
@@ -424,35 +334,15 @@ quitGame() {
   // Logic to quit the game (e.g., redirect to the main menu or close the app)
 }
 
-  harvestPlant(plant) {
-    console.log(`Attempting to harvest plant with type: ${plant.plantType}`);
-
-    // Save the state before destroying the plant
-    this.saveState("harvest", {
-        x: plant.x,
-        y: plant.y,
-        harvestedPlant: {
-            x: plant.x,
-            y: plant.y,
-            plantType: plant.plantType, // Save the type
-            days: plant.days,
-            water: plant.water,
-            sun: plant.sun,
-            level: plant.level, // Save the level explicitly
-        },
-    });
-    // Add plant type to harvested set
-    this.harvestedPlantTypes.add(plant.plantType);
-    console.log("Harvested Plant Types:", Array.from(this.harvestedPlantTypes));
-
-    // Check if all plant types have been harvested
-    const allPlantTypes = ["wheat", "plum", "tomato"]; // Define all possible plant types
-    if (allPlantTypes.every(type => this.harvestedPlantTypes.has(type))) {
-        this.showCompletionPopup();
+harvestPlant(plant) {
+  if (plant) {
+    const harvested = plant.harvest(); // Use the `harvest()` method from Plant.js
+    if (harvested) {
+      console.log(`Harvested:`, harvested);
     }
-
-    plant.destroy();
-    console.log(`${plant.plantType} at (${plant.x}, ${plant.y}) harvested.`);
+  } else {
+    console.log("No plant found to harvest.");
+  }
 }
 
 
@@ -817,7 +707,7 @@ loadState(state) {
   }
 
   onPressed(content) {
-
+    console.log(content);
   }
 
   createPlant(type, frame, reqs){
@@ -825,7 +715,6 @@ loadState(state) {
     this.availablePlants.push(newPlant);
     console.log(this.availablePlants);
   }
-
   showDay() {
     if (this.dayText) {
       this.dayText.setText(`Day: ${this.day}`);
@@ -922,52 +811,27 @@ loadState(state) {
     this.showDay();
 }
 
-  checkPlantReq() {
-    const surroundingTiles = [
-      { x: -1, y: -1 },
-      { x: 0, y: -1 },
-      { x: 1, y: -1 },
-      { x: -1, y: 0 },
-      { x: 1, y: 0 },
-      { x: -1, y: 1 },
-      { x: 0, y: 1 },
-      { x: 1, y: 1 },
-    ];
-    this.plants.getChildren().forEach((plant) => {
-      let surroundingPlants = 0;
+checkPlantReq() {
+  this.plants.getChildren().forEach((plant) => {
+    const neighbors = this.plantGrid.getNeighbors(plant.x, plant.y).length;
+    plant.newDay(neighbors); // Pass neighbor count to the plant
+  });
+}
 
-      surroundingTiles.forEach((offset) => {
-        const tileX = plant.x + offset.x * 16;
-        const tileY = plant.y + offset.y * 16;
-        const tile = this.tiledGroundLayer.getTileAtWorldXY(tileX, tileY);
+plantCheck(currentTile) {
+  return this.plants.getChildren().some((plant) => {
+    const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
+      plant.x,
+      plant.y
+    );
 
-        if (tile) {
-          // console.log(`Tile found at (${tileX}, ${tileY})`);
-          if (this.plantCheck(tile)) {
-            surroundingPlants++;
-          }
-        }
-      });
-
-      /* calls a function that will check if the surrounding plants matches with required plants */
-      plant.newDay(surroundingPlants);
-    });
-  }
-
-  plantCheck(currentTile) {
-    return this.plants.getChildren().some((plant) => {
-      const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
-        plant.x,
-        plant.y
-      );
-
-      return (
-        plantTile &&
-        plantTile.x === currentTile.x &&
-        plantTile.y === currentTile.y
-      );
-    });
-  }
+    return (
+      plantTile &&
+      plantTile.x === currentTile.x &&
+      plantTile.y === currentTile.y
+    );
+  });
+}
   
 
   farmingUpdate() {
@@ -1002,34 +866,17 @@ loadState(state) {
 }
 
 addPlant(x, y, texture, level = 0) {
-  const plant = new Plant(this, x, y, texture);
+  const plantData = { x, y, level, water: 0, sun: 0, plantType: null, frameIndex: 0 };
+  const plant = Plant.createFromData(this, plantData);
+
   plant.setPlantTypes(this.availablePlants);
-  plant.level = level;
-  plant.days = 0;
-  plant.water = 0;
-  plant.sun = 0;
-
-  switch (plant.plantType) {
-      case "wheat":
-          plant.setFrame(1 + plant.level);
-          break;
-      case "plum":
-          plant.setFrame(7 + plant.level);
-          break;
-      case "tomato":
-          plant.setFrame(13 + plant.level);
-          break;
-  }
-
   plant.setInteractive().on("pointerdown", () => {
-      plant.showPlantInfoPopup(this);
+    plant.showPlantInfoPopup(this);
   });
 
-  this.plants.add(plant);
-  this.plantGrid.setPlant(x, y, plant);
-
-  // Save game after adding a plant
-  this.saveGameSlot(this.activeSaveSlot);
+  this.plants.add(plant); // Add to Phaser group
+  this.plantGrid.addPlant(x, y, plant); // Add to grid using PlantGrid
+  this.saveGameSlot(this.activeSaveSlot); // Save game state
   return plant;
 }
 
@@ -1045,18 +892,11 @@ growPlant(x, y) {
 
 }
 waterPlant(plant) {
-  const randomWaterIncrease = Phaser.Math.Between(20, 100);
-
-  // Save the watering action
-  this.saveState("water", {
-    x: plant.x,
-    y: plant.y,
-    previousWater: plant.water,
-    newWater: Math.min(plant.water + randomWaterIncrease, 100),
-  });
-
-  plant.water = Math.min(plant.water + randomWaterIncrease, 100);
-  console.log(`Plant watered: ${plant.water} (+${randomWaterIncrease})`);
+  if (plant) {
+    plant.water(); // Use the `water()` method from Plant.js
+  } else {
+    console.log("No plant found to water.");
+  }
 }
 
 
