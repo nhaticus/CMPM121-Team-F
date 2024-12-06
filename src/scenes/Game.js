@@ -41,8 +41,6 @@ class Game extends Phaser.Scene {
         this.plantGrid = new PlantGrid(gridWidth, gridHeight);
     }
     }
-  
-
     
     /*  camera  */
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
@@ -72,13 +70,9 @@ class Game extends Phaser.Scene {
 
     /*  house */
     this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
-
     inventorySetup(this);
 
-
-
     /* undo & redo buttons */
-    // Add Undo Button
     const undoButton = this.add
     .image(this.cameras.main.width - 100, 50, 'UndoButton')
     .setOrigin(0.5)
@@ -140,8 +134,6 @@ class Game extends Phaser.Scene {
             this.showQuitPopup();
             this.saveGameSlot(this.activeSaveSlot); // Save to active slot
         });
-
-
         
     //create plants with different requirements (Must have frame in order in spritesheets);
     this.createPlant("wheat", 1, ['sun', 'water', 'neighbor']);
@@ -321,7 +313,6 @@ saveGameSlot(slot) {
     this.saveGameSlot(slot);
   }
   
-  
   closePopup(...elements) {
     // Destroy all elements passed to the function
     elements.forEach((element) => element.destroy());
@@ -344,7 +335,6 @@ harvestPlant(plant) {
     console.log("No plant found to harvest.");
   }
 }
-
 
   showCompletionPopup() {
     console.log("Popup triggered");
@@ -398,7 +388,6 @@ harvestPlant(plant) {
     this.physics.resume();
   }
 
-
   saveGame() {
     const gameState = {
       day: this.day,
@@ -416,7 +405,6 @@ harvestPlant(plant) {
     localStorage.setItem("gameState", JSON.stringify(gameState));
     console.log("Game saved:", gameState);
   }
-  
 
   undoAction() {
     console.log("Undo Action Triggered");
@@ -511,8 +499,6 @@ harvestPlant(plant) {
         console.log("Undo Stack is Empty");
     }
 }
-
-
 
 redoAction() {
   console.log("Redo Action Triggered");
@@ -634,7 +620,6 @@ saveState(actionType, payload) {
         water: plant.water,
         sun: plant.sun,
     })),
-  
     };
 
   // If action involves plants, save plant-specific data
@@ -695,7 +680,6 @@ loadState(state) {
   } else {
       console.error("No plants data found in state.");
   }
-
   console.log("State Loaded: Day and Plants Restored");
 }
 
@@ -898,7 +882,6 @@ waterPlant(plant) {
     console.log("No plant found to water.");
   }
 }
-
 
   update() {
     this.player.update(this.cursors, this);
