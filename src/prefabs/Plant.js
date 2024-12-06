@@ -1,3 +1,4 @@
+//import { t, setLanguage } from '../utils/localization.js'; // Adjust the path as needed
 class Plant extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, texture) {
     super(scene, x, y, texture);
@@ -104,16 +105,11 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       .text(
         centerX,
         centerY - popupHeight / 2, // Position text at the top of the popup
-        "Days Planted: " +
-          this.days +
-          "\nWater Level: " +
-          this.water +
-          "%\nCurrent Sunlight: " +
-          this.sun +
-          "%\nRequirements: " +
-          this.requirements +
-          "\nPlant Level: " +
-          this.level,
+        t("DAYS_PLANTED") +this.days +
+        "%\n" + t("WATER_LEVEL") + this.water +
+          "%\n" + t("CURRENT_SUNLIGHT") + this.sun +
+          "%\n" + t("REQUIREMENTS") + this.requirements +
+          "\n" + t(PLANT_LEVEL) + this.level,
         {
           font: "14px Arial",
           color: "#ffffff",
@@ -127,7 +123,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     const buttonYOffset = popupHeight / 2 - 40;
 
     const harvestButton = scene.add
-  .text(centerX - 80, centerY + buttonYOffset, "Harvest", {
+  .text(centerX - 80, centerY + buttonYOffset, t("HARVEST"), {
     font: "14px Arial",
     color: "#ffffff",
     backgroundColor: "#00ff00",
@@ -153,7 +149,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   });
 
     const waterButton = scene.add
-      .text(centerX + 80, centerY + buttonYOffset, "Water", {
+      .text(centerX + 80, centerY + buttonYOffset, t("WATER"), {
         font: "14px Arial",
         color: "#ffffff",
         backgroundColor: "#0000ff",
@@ -181,7 +177,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       });
 
     const closeButton = scene.add
-      .text(centerX, centerY + popupHeight / 2 - 20, "Close", {
+      .text(centerX, centerY + popupHeight / 2 - 20, t("CLOSE"), {
         font: "14px Arial",
         color: "#ff0000",
         backgroundColor: "#000000",
@@ -227,7 +223,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     else{
       this.neighborReq = 0;
     }
-    this.requirements = `\nWater: ${this.waterReq}% \nSurrounding Plants: ${this.neighborReq} \n Sunlight: ${this.sunReq}`;
+    this.requirements = `\n` + t("WATER_REQ") + `${this.waterReq}% \n` + t("SURROUND") + `${this.neighborReq} \n` + t("SUN_REQ") + `${this.sunReq}`;
   }
 
   newDay(x) {

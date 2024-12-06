@@ -12,6 +12,15 @@ const translations = {
         WATER: "Water",
         SAVE : "Save",
         CLOSE: "Close",
+        DAYS_PLANTED: "Days Planted: ",
+        WATER_LEVEL: "Water Level: ",
+        CURRENT_SUNLIGHT: "Current Sunlight: ",
+        REQUIREMENTS: "Requirements: ",
+        PLANT_LEVEL: "Plant Level: ",
+        SURROUND: "Surrounding Plants: ",
+        SUN_REQ: "Sunlight: ",
+        WATER_REQ: "Water: ",
+
         // Add more keys as needed
     },
     // Add additional languages here
