@@ -5,9 +5,13 @@ class Game extends Phaser.Scene {
     this.redoStack = [];
     this.plantGrid = null;
     this.harvestedPlantTypes = new Set(); // Track harvested plant types
+    this.activeSaveSlot = 1; // Default to Slot 1
   }
 
   create() {
+    // Initialize the game based on the active save slot
+    this.loadGameSlot(this.activeSaveSlot);
+
     /* map */
     const map = this.add.tilemap("mapJSON");
     const tiledGround = map.addTilesetImage("TiledGround", "tiledGroundTiles");
@@ -265,82 +269,159 @@ class Game extends Phaser.Scene {
         .setDisplaySize(24, 24)
         .on("pointerdown", () => {
             this.showQuitPopup();
+            this.saveGameSlot(this.activeSaveSlot); // Save to active slot
         });
   }
 
+  loadGameSlot(slot) {
+    const savedData = localStorage.getItem(`gameStateSlot${slot}`);
+    if (savedData) {
+      console.log(`Loaded data from slot ${slot}`);
+      const { day, plants } = JSON.parse(savedData);
+  
+      this.day = day || 1;
+      this.showDay(); // Ensure the day text is updated
+  
+      if (this.plants) {
+        this.plants.clear(true, true); // Clear existing plants
+      } else {
+        this.plants = this.add.group();
+      }
+  
+      plants.forEach((plantData) => {
+        const plant = new Plant(this, plantData.x, plantData.y, "plant");
+        Object.assign(plant, plantData);
+        this.plants.add(plant);
+      });
+    } else {
+      console.log(`Starting a new game in slot ${slot}`);
+      this.day = 1; // Reset day for new game
+      this.showDay(); // Ensure the day text is displayed
+  
+      if (this.plants) {
+        this.plants.clear(true, true); // Clear any leftover plants
+      } else {
+        this.plants = this.add.group();
+      }
+  
+      if (!this.plantGrid) {
+        const gridWidth = 10;
+        const gridHeight = 10;
+        this.plantGrid = new PlantGrid(gridWidth, gridHeight); // Initialize PlantGrid
+      }
+  
+      this.plantGrid.setGrid([]); // Reset the plant grid
+    }
+  }
+  
+  
+  
+
+  saveGameSlot(slot) {
+    const gameState = {
+      day: this.day,
+      plants: this.plants.getChildren().map((plant) => ({
+        x: plant.x,
+        y: plant.y,
+        days: plant.days,
+        water: plant.water,
+        sun: plant.sun,
+        level: plant.level,
+        plantType: plant.plantType,
+      })),
+    };
+    localStorage.setItem(`gameStateSlot${slot}`, JSON.stringify(gameState));
+    console.log(`Game saved to slot ${slot}:`, gameState);
+  }
+
   // Show Quit Popup
-showQuitPopup() {
-  // Pause the game
-  this.physics.pause();
-
-  // Get the camera's center
-  const centerX = this.cameras.main.midPoint.x;
-  const centerY = this.cameras.main.midPoint.y;
-
-  // Create a background overlay for the popup
-  const overlay = this.add
+  showQuitPopup() {
+    // Pause the game
+    this.physics.pause();
+  
+    // Get the camera's center
+    const centerX = this.cameras.main.midPoint.x;
+    const centerY = this.cameras.main.midPoint.y;
+  
+    // Create a background overlay for the popup
+    const overlay = this.add
       .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
       .setOrigin(0.5)
       .setDepth(100);
-
-  // Add popup text
-  const popupText = this.add
+  
+    // Add popup text
+    const popupText = this.add
       .text(centerX, centerY - 60, "Select a Save Slot.", {
-          font: "18px Arial",
-          color: "#ffffff",
-          align: "center",
+        font: "18px Arial",
+        color: "#ffffff",
+        align: "center",
       })
       .setOrigin(0.5)
       .setDepth(101);
-
-      // Create Save 1 button
-    const save1Button = this.add
-    .text(centerX, centerY - 30, "Save 1", {
-        font: "16px Arial",
-        color: "#ffffff",
-        backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
-    })
-    .setInteractive()
-    .setOrigin(0.5)
-    .setDepth(102)
-    .on("pointerdown", () => {
-        this.saveGameSlot(1);
-        this.closePopup(overlay, popupTitle, save1Button, save2Button, save3Button);
+  
+    // Collect all buttons in an array
+    const slotButtons = [];
+    const slots = [1, 2, 3];
+    slots.forEach((slot, index) => {
+      const slotButton = this.add
+        .text(centerX, centerY - 30 + index * 40, `Save ${slot}`, {
+          font: "16px Arial",
+          color: "#ffffff",
+          backgroundColor: "#000000",
+          padding: { x: 10, y: 5 },
+        })
+        .setInteractive()
+        .setOrigin(0.5)
+        .setDepth(102)
+        .on("pointerdown", () => {
+          this.activeSaveSlot = slot;
+  
+          // Check if the slot has saved data
+          const savedData = localStorage.getItem(`gameStateSlot${slot}`);
+          if (savedData) {
+            console.log(`Loading data from slot ${slot}`);
+            this.loadGameSlot(slot); // Load the saved data
+          } else {
+            console.log(`Starting a new game in slot ${slot}`);
+            this.startNewGameState(slot); // Reset to a new state
+          }
+  
+          this.closePopup(overlay, popupText, ...slotButtons); // Close the popup and remove buttons
+        });
+  
+      slotButtons.push(slotButton); // Add the button to the array
     });
-
-// Create Save 2 button
-const save2Button = this.add
-    .text(centerX, centerY + 10, "Save 2", {
-        font: "16px Arial",
-        color: "#ffffff",
-        backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
-    })
-    .setInteractive()
-    .setOrigin(0.5)
-    .setDepth(102)
-    .on("pointerdown", () => {
-        this.saveGameSlot(2);
-        this.closePopup(overlay, popupTitle, save1Button, save2Button, save3Button);
-    });
-
-// Create Save 3 button
-const save3Button = this.add
-    .text(centerX, centerY + 50, "Save 3", {
-        font: "16px Arial",
-        color: "#ffffff",
-        backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
-    })
-    .setInteractive()
-    .setOrigin(0.5)
-    .setDepth(102)
-    .on("pointerdown", () => {
-        this.saveGameSlot(3);
-        this.closePopup(overlay, popupTitle, save1Button, save2Button, save3Button);
-    });
+  }
+  
+  startNewGameState(slot) {
+    // Reset the game to a new state
+    this.day = 1;
+    this.showDay();
+  
+    if (this.plants) {
+      this.plants.clear(true, true); // Clear all plants
+    } else {
+      this.plants = this.add.group();
     }
+  
+    if (!this.plantGrid) {
+      const gridWidth = 10;
+      const gridHeight = 10;
+      this.plantGrid = new PlantGrid(gridWidth, gridHeight); // Initialize plant grid
+    }
+    this.plantGrid.setGrid([]); // Reset the plant grid
+  
+    // Save the initial state to the selected slot
+    this.saveGameSlot(slot);
+  }
+  
+  
+  closePopup(...elements) {
+    // Destroy all elements passed to the function
+    elements.forEach((element) => element.destroy());
+    this.physics.resume(); // Resume the game after closing the popup
+  }
+  
     
 
     // Quit Game
@@ -764,7 +845,8 @@ loadState(state) {
           backgroundColor: "#000000",
           padding: { x: 5, y: 5 },
         })
-        .setScrollFactor(0); // Fix the text to the camera view
+        .setScrollFactor(0) // Fix the text to the camera view
+        .setDepth(200);
     }
   }
 
