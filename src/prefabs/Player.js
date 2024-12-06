@@ -13,7 +13,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(1);
 
     playerDirection = "down";
-    speed = 100;
+    playerSpeed = 100;
   }
 
   update(cursors, scene) {
@@ -44,7 +44,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     playerVector.normalize();
     let playerMovement;
 
-    this.setVelocity(playerVector.x * speed, playerVector.y * speed);
+    this.setVelocity(
+      playerVector.x * playerSpeed,
+      playerVector.y * playerSpeed
+    );
     playerVector.length()
       ? (playerMovement = "run")
       : (playerMovement = "idle");
