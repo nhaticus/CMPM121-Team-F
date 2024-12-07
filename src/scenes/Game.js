@@ -59,7 +59,6 @@ class Game extends Phaser.Scene {
         pointer.worldX,
         pointer.worldY
       );
-
       if (tile) {
         //console.log("Clicked on the house layer! Tile index:", tile.index); // Debug: See which tile was clicked
         this.popupManager.showSleepingPopup(); // Delegate to Popup.js
@@ -89,6 +88,7 @@ class Game extends Phaser.Scene {
     this.popupManager = new Popup(this); // Initialize Popup manager
   }
 
+  /* Save/Load  */
   loadGameSlot(slot) {
     const savedData = this.saveManager.loadGame(slot);
   
@@ -97,7 +97,7 @@ class Game extends Phaser.Scene {
       this.dayManager.day = day || 1; // Restore day
       this.showDay();
   
-      this.plants.clear(true, true); // Clear current plants
+      this.plants.clear(true, true);
       plants.forEach((plantData) => {
         if (plantData) {
           const plant = Plant.createFromData(this, plantData);
@@ -129,7 +129,7 @@ saveGameSlot(slot) {
     }),
   };
 
-  this.saveManager.saveGame(slot, gameState); // Delegate to Saving.js
+  this.saveManager.saveGame(slot, gameState);
 }
 
 quickSaveGame() {
@@ -145,15 +145,133 @@ quickSaveGame() {
       plantType: plant.plantType,
     })),
   };
-
-  this.saveManager.quickSave(gameState); // Delegate to Saving.js
+  this.saveManager.quickSave(gameState);
 }
 
-  // Show Quit Popup
+saveGame() {
+  const gameState = {
+    day: this.dayManager.getCurrentDay(),
+    plants: this.plants.getChildren().map((plant) => ({
+      x: plant.x,
+      y: plant.y,
+      days: plant.days,
+      water: plant.water,
+      sun: plant.sun,
+      level: plant.level,
+      plantType: plant.plantType,
+    })),
+  };
+
+  this.saveManager.saveGame(this.activeSaveSlot, gameState); // Delegate to Saving.js
+  console.log("Game saved:", gameState);
+}
+
+saveState(actionType, payload) {
+  const state = {
+      actionType,   // Type of action (e.g., "plant", "water", "progressDay")
+      payload,      // Action-specific payload (e.g., plant details)
+      day: this.day, // Current day
+      plants: this.plants.getChildren().map((plant) => ({
+        x: plant.x,
+        y: plant.y,
+        level: plant.level,
+        plantType: plant.plantType,
+        days: plant.days,
+        water: plant.water,
+        sun: plant.sun,
+    })),
+    };
+
+  // If action involves plants, save plant-specific data
+  if (actionType === "plant") {
+      state.payload = {
+          x: payload.x,
+          y: payload.y,
+          level: payload.level,
+          days: payload.days,
+          water: payload.water,
+          sun: payload.sun,
+          plantType: payload.plantType, // Save plantType explicitly
+      };
+  }
+
+  console.log("Saving State:", JSON.stringify(state, null, 2)); // Debug log
+  this.undoStack.push(state);
+  this.redoStack = []; // Clear redo stack on new action
+}
+
+loadState(state) {
+  console.log("Loading State:", state);
+
+  // Update the day
+  this.day = state.day;
+  this.showDay(); // Update day text
+
+  // Restore plants
+  this.plants.clear(true, true); // Remove all current plants
+  if (state.plants && Array.isArray(state.plants)) {
+      state.plants.forEach((plantData) => {
+          const plant = new Plant(this, plantData.x, plantData.y, "plant");
+          plant.setPlantTypes(this.availablePlants);
+          Object.assign(plant, plantData); // Restore plant properties
+          
+          // Set the correct sprite frame based on type and level
+          switch (plant.plantType) {
+              case "wheat":
+                  plant.setFrame(1 + plant.level);
+                  break;
+              case "plum":
+                  plant.setFrame(7 + plant.level);
+                  break;
+              case "tomato":
+                  plant.setFrame(13 + plant.level);
+                  break;
+              default:
+                  console.error(`Unknown plant type: ${plant.plantType}`);
+          }
+
+          // Reapply interactivity
+          plant.setInteractive().on("pointerdown", () => {
+              plant.showPlantInfoPopup(this);
+          });
+
+          this.plants.add(plant);
+      });
+  } else {
+      console.error("No plants data found in state.");
+  }
+  console.log("State Loaded: Day and Plants Restored");
+}
+
+  /* Popups */
   showQuitPopup() {
     this.popupManager.showSaveSlotPopup();
 }
+
+closePopup(...elements) {
+  // Destroy all elements passed to the function
+  elements.forEach((element) => element.destroy());
+  this.physics.resume(); // Resume the game after closing the popup
+} 
+
+showCompletionPopup() {
+  this.popupManager.showHarvestedAllPopup();
+}
+
+closePopup(...elements) {
+  this.popupManager.closePopup(...elements);
+}
   
+showPopup() {
+  this.popupManager.showSleepingPopup();
+}
+
+closePopup(...elements) {
+  elements.forEach((element) => element.destroy());
+  this.physics.resume();
+}
+
+/* Start/Quit/Restart */
   startNewGameState(slot) {
     const defaultState = {
       day: 1,
@@ -169,55 +287,16 @@ quickSaveGame() {
     this.plantGrid.clearGrid();
   }
   
-  closePopup(...elements) {
-    // Destroy all elements passed to the function
-    elements.forEach((element) => element.destroy());
-    this.physics.resume(); // Resume the game after closing the popup
-  } 
-
-    // Quit Game
 quitGame() {
   console.log("Game exited");
   // Logic to quit the game (e.g., redirect to the main menu or close the app)
 }
-
-harvestPlant(plant) {
-  if (plant) {
-    const harvested = plant.harvest(); // Use the `harvest()` method from Plant.js
-    if (harvested) {
-      console.log(`Harvested:`, harvested);
-    }
-  } else {
-    console.log("No plant found to harvest.");
-  }
+restartGameData() {
+  this.saveManager.restartGameData(); 
+  console.log("Game data has been reset.");
 }
-
-showCompletionPopup() {
-  this.popupManager.showHarvestedAllPopup();
-}
-
-closePopup(...elements) {
-  this.popupManager.closePopup(...elements);
-}
-
-  saveGame() {
-    const gameState = {
-      day: this.dayManager.getCurrentDay(),
-      plants: this.plants.getChildren().map((plant) => ({
-        x: plant.x,
-        y: plant.y,
-        days: plant.days,
-        water: plant.water,
-        sun: plant.sun,
-        level: plant.level,
-        plantType: plant.plantType,
-      })),
-    };
   
-    this.saveManager.saveGame(this.activeSaveSlot, gameState); // Delegate to Saving.js
-    console.log("Game saved:", gameState);
-  }
-
+/* Undo/Redo */
   undoAction() {
     console.log("Undo Action Triggered");
     if (this.undoStack.length > 0) {
@@ -418,97 +497,85 @@ redoAction() {
   }
 }
 
-saveState(actionType, payload) {
-  const state = {
-      actionType,   // Type of action (e.g., "plant", "water", "progressDay")
-      payload,      // Action-specific payload (e.g., plant details)
-      day: this.day, // Current day
-      plants: this.plants.getChildren().map((plant) => ({
-        x: plant.x,
-        y: plant.y,
-        level: plant.level,
-        plantType: plant.plantType,
-        days: plant.days,
-        water: plant.water,
-        sun: plant.sun,
-    })),
-    };
-
-  // If action involves plants, save plant-specific data
-  if (actionType === "plant") {
-      state.payload = {
-          x: payload.x,
-          y: payload.y,
-          level: payload.level,
-          days: payload.days,
-          water: payload.water,
-          sun: payload.sun,
-          plantType: payload.plantType, // Save plantType explicitly
-      };
-  }
-
-  console.log("Saving State:", JSON.stringify(state, null, 2)); // Debug log
-  this.undoStack.push(state);
-  this.redoStack = []; // Clear redo stack on new action
-}
-
-loadState(state) {
-  console.log("Loading State:", state);
-
-  // Update the day
-  this.day = state.day;
-  this.showDay(); // Update day text
-
-  // Restore plants
-  this.plants.clear(true, true); // Remove all current plants
-  if (state.plants && Array.isArray(state.plants)) {
-      state.plants.forEach((plantData) => {
-          const plant = new Plant(this, plantData.x, plantData.y, "plant");
-          plant.setPlantTypes(this.availablePlants);
-          Object.assign(plant, plantData); // Restore plant properties
-          
-          // Set the correct sprite frame based on type and level
-          switch (plant.plantType) {
-              case "wheat":
-                  plant.setFrame(1 + plant.level);
-                  break;
-              case "plum":
-                  plant.setFrame(7 + plant.level);
-                  break;
-              case "tomato":
-                  plant.setFrame(13 + plant.level);
-                  break;
-              default:
-                  console.error(`Unknown plant type: ${plant.plantType}`);
-          }
-
-          // Reapply interactivity
-          plant.setInteractive().on("pointerdown", () => {
-              plant.showPlantInfoPopup(this);
-          });
-
-          this.plants.add(plant);
-      });
-  } else {
-      console.error("No plants data found in state.");
-  }
-  console.log("State Loaded: Day and Plants Restored");
-}
-
-restartGameData() {
-  this.saveManager.restartGameData(); // Delegate to Saving.js
-  console.log("Game data has been reset.");
-}
 
   onPressed(content) {
     console.log(content);
   }
-
+/* Planting */
+  harvestPlant(plant) {
+    if (plant) {
+      const harvested = plant.harvest(); // Use the `harvest()` method from Plant.js
+      if (harvested) {
+        console.log(`Harvested:`, harvested);
+      }
+    } else {
+      console.log("No plant found to harvest.");
+    }
+  }
+  
   createPlant(type, frame, reqs){
     const newPlant = [type, frame, reqs];
     this.availablePlants.push(newPlant);
     console.log(this.availablePlants);
   }
+
+  checkPlantReq() {
+    this.plants.getChildren().forEach((plant) => {
+      const neighbors = this.plantGrid.getNeighbors(plant.x, plant.y).length;
+      plant.newDay(neighbors); // Pass neighbor count to the plant
+    });
+  }
+  
+  plantCheck(currentTile) {
+    return this.plants.getChildren().some((plant) => {
+      const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
+        plant.x,
+        plant.y
+      );
+  
+      return (
+        plantTile &&
+        plantTile.x === currentTile.x &&
+        plantTile.y === currentTile.y
+      );
+    });
+  }
+
+  addPlant(x, y, texture, level = 0) {
+    const plantData = { x, y, level, water: 0, sun: 0, plantType: null, frameIndex: 0 };
+    const plant = Plant.createFromData(this, plantData);
+  
+    plant.setPlantTypes(this.availablePlants);
+    plant.setInteractive().on("pointerdown", () => {
+      plant.showPlantInfoPopup(this);
+    });
+  
+    this.plants.add(plant); // Add to Phaser group
+    this.plantGrid.addPlant(x, y, plant); // Add to grid using PlantGrid
+    this.saveGameSlot(this.activeSaveSlot); // Save game state
+    return plant;
+  }
+  
+  getPlant(x, y) {
+    return this.plantGrid.getPlant(x, y);
+  }
+  
+  growPlant(x, y) {
+    const plant = this.getPlant(x, y);
+    if (plant) {
+      plant.grow();
+    }
+  
+  }
+  waterPlant(plant) {
+    if (plant) {
+      plant.water(); // Use the `water()` method from Plant.js
+    } else {
+      console.log("No plant found to water.");
+    }
+  }
+
+/* Day */
   showDay() {
     if (this.dayText) {
       this.dayText.setText(`Day: ${this.dayManager.getCurrentDay()}`);
@@ -523,15 +590,6 @@ restartGameData() {
         .setScrollFactor(0)
         .setDepth(200);
     }
-  }
-
-  showPopup() {
-    this.popupManager.showSleepingPopup();
-  }
-
-  closePopup(...elements) {
-    elements.forEach((element) => element.destroy());
-    this.physics.resume();
   }
 
   newDay() {
@@ -552,28 +610,7 @@ restartGameData() {
     this.showDay();
   }
 
-checkPlantReq() {
-  this.plants.getChildren().forEach((plant) => {
-    const neighbors = this.plantGrid.getNeighbors(plant.x, plant.y).length;
-    plant.newDay(neighbors); // Pass neighbor count to the plant
-  });
-}
-
-plantCheck(currentTile) {
-  return this.plants.getChildren().some((plant) => {
-    const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
-      plant.x,
-      plant.y
-    );
-
-    return (
-      plantTile &&
-      plantTile.x === currentTile.x &&
-      plantTile.y === currentTile.y
-    );
-  });
-}
-
+/* Update */
   farmingUpdate() {
     const tile = this.tiledGroundLayer.getTileAtWorldXY(
         this.player.x,
@@ -603,40 +640,6 @@ plantCheck(currentTile) {
             }
         }
     }
-}
-
-addPlant(x, y, texture, level = 0) {
-  const plantData = { x, y, level, water: 0, sun: 0, plantType: null, frameIndex: 0 };
-  const plant = Plant.createFromData(this, plantData);
-
-  plant.setPlantTypes(this.availablePlants);
-  plant.setInteractive().on("pointerdown", () => {
-    plant.showPlantInfoPopup(this);
-  });
-
-  this.plants.add(plant); // Add to Phaser group
-  this.plantGrid.addPlant(x, y, plant); // Add to grid using PlantGrid
-  this.saveGameSlot(this.activeSaveSlot); // Save game state
-  return plant;
-}
-
-getPlant(x, y) {
-  return this.plantGrid.getPlant(x, y);
-}
-
-growPlant(x, y) {
-  const plant = this.getPlant(x, y);
-  if (plant) {
-    plant.grow();
-  }
-
-}
-waterPlant(plant) {
-  if (plant) {
-    plant.water(); // Use the `water()` method from Plant.js
-  } else {
-    console.log("No plant found to water.");
-  }
 }
 
   update() {
