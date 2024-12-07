@@ -13,7 +13,7 @@ class Game extends Phaser.Scene {
 
   create() {
     testFunction();
-    console.log(testVar);
+    //console.log(testVar);
     
     setLanguage("en");
 
@@ -28,16 +28,16 @@ class Game extends Phaser.Scene {
     const gridHeight = 10;
 
     if(localStorage){
-      console.log("there is local storage!");
+      //console.log("there is local storage!");
       const savedGrid = localStorage.getItem("gridState");
-      console.log(savedGrid);
+      //console.log(savedGrid);
       if(savedGrid){
-        console.log("SAVED GRID");
+        //console.log("SAVED GRID");
         this.plantGrid = new PlantGrid(gridWidth, gridHeight);
         this.plantGrid.setGrid(JSON.parse(savedGrid));
       }  
       else{
-        console.log("making new grid");
+        //console.log("making new grid");
         this.plantGrid = new PlantGrid(gridWidth, gridHeight);
     }
     }
@@ -51,7 +51,7 @@ class Game extends Phaser.Scene {
 
     this.input.on("pointerdown", (pointer) => {
       // Get the tile at the clicked position in the house layer
-      const tile = this.houseLayer.getTileAtWorldXY(
+      const tile = this.layers["houseLayer"].getTileAtWorldXY(
         pointer.worldX,
         pointer.worldY
       );
@@ -69,7 +69,7 @@ class Game extends Phaser.Scene {
     this.showDay();
 
     /*  house */
-    this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
+    this.layers["houseLayer"].setTileIndexCallback(10, this.showPopup, this);
     inventorySetup(this);
 
     /* undo & redo buttons */
@@ -142,14 +142,14 @@ class Game extends Phaser.Scene {
   }
 
   loadGameSlot(slot) {
-    console.log(`Loading game from slot ${slot}...`);
+    //console.log(`Loading game from slot ${slot}...`);
     const savedData = localStorage.getItem(`gameStateSlot${slot}`);
-    console.log("Retrieved saved data:", savedData);
+    //console.log("Retrieved saved data:", savedData);
 
     if (savedData) {
         const { day, plants } = JSON.parse(savedData);
 
-        console.log("Day restored:", day);
+        //console.log("Day restored:", day);
         this.day = day || 1;
         this.showDay();
 
@@ -157,21 +157,21 @@ class Game extends Phaser.Scene {
             const gridWidth = 10; // Adjust to your grid size
             const gridHeight = 10;
             this.plantGrid = new PlantGrid(gridWidth, gridHeight);
-            console.log("Initialized a new PlantGrid.");
+            //console.log("Initialized a new PlantGrid.");
         }
 
         if (!this.plants) {
             this.plants = this.add.group();
-            console.log("Initialized `this.plants` group.");
+            //console.log("Initialized `this.plants` group.");
         } else {
             this.plants.clear(true, true);
         }
 
         if (plants && Array.isArray(plants)) {
-            console.log("Restoring plants from save data...");
+            //console.log("Restoring plants from save data...");
             plants.forEach((plantData, index) => {
                 if (plantData) {
-                    console.log(`Restoring plant ${index}:`, plantData);
+                    //console.log(`Restoring plant ${index}:`, plantData);
                     const plant = new Plant(this, plantData.x, plantData.y, "plant");
                     Object.assign(plant, plantData);
 
@@ -198,22 +198,22 @@ class Game extends Phaser.Scene {
                 }
             });
 
-            console.log("PlantGrid updated:", this.plantGrid.getGrid());
+            //console.log("PlantGrid updated:", this.plantGrid.getGrid());
         }
     } else {
-        console.log(`No saved data found for slot ${slot}. Starting a new game.`);
+        //console.log(`No saved data found for slot ${slot}. Starting a new game.`);
         this.startNewGameState(slot);
     }
 } 
   
 saveGameSlot(slot) {
-  console.log(`Saving game to slot ${slot}...`);
+  //console.log(`Saving game to slot ${slot}...`);
 
   const gameState = {
       day: this.day,
       plants: this.plantGrid.getGrid().map((plant, index) => {
           if (plant) {
-              console.log(`Saving plant at grid index ${index}:`, plant);
+              //console.log(`Saving plant at grid index ${index}:`, plant);
               return {
                   x: plant.x,
                   y: plant.y,
@@ -229,7 +229,7 @@ saveGameSlot(slot) {
   };
 
   localStorage.setItem(`gameStateSlot${slot}`, JSON.stringify(gameState));
-  console.log(`Game saved to slot ${slot}:`, gameState);
+  //console.log(`Game saved to slot ${slot}:`, gameState);
 }
 
   // Show Quit Popup
@@ -277,10 +277,10 @@ saveGameSlot(slot) {
           // Check if the slot has saved data
           const savedData = localStorage.getItem(`gameStateSlot${slot}`);
           if (savedData) {
-            console.log(`Loading data from slot ${slot}`);
+            //console.log(`Loading data from slot ${slot}`);
             this.loadGameSlot(slot); // Load the saved data
           } else {
-            console.log(`Starting a new game in slot ${slot}`);
+            //console.log(`Starting a new game in slot ${slot}`);
             this.startNewGameState(slot); // Reset to a new state
           }
   
@@ -321,7 +321,7 @@ saveGameSlot(slot) {
 
     // Quit Game
 quitGame() {
-  console.log("Game exited");
+  //console.log("Game exited");
   // Logic to quit the game (e.g., redirect to the main menu or close the app)
 }
 
@@ -329,15 +329,15 @@ harvestPlant(plant) {
   if (plant) {
     const harvested = plant.harvest(); // Use the `harvest()` method from Plant.js
     if (harvested) {
-      console.log(`Harvested:`, harvested);
+      //console.log(`Harvested:`, harvested);
     }
   } else {
-    console.log("No plant found to harvest.");
+    //console.log("No plant found to harvest.");
   }
 }
 
   showCompletionPopup() {
-    console.log("Popup triggered");
+    //console.log("Popup triggered");
   
     // Pause the game temporarily (remove this line if it causes issues)
     // this.physics.pause();
@@ -352,7 +352,7 @@ harvestPlant(plant) {
       .setOrigin(0.5)
       .setDepth(100)
       .setStrokeStyle(2, 0xffffff); // Add a border for visibility
-    console.log("Overlay created");
+    //console.log("Overlay created");
   
     // Add popup text
     const popupText = this.add
@@ -363,7 +363,7 @@ harvestPlant(plant) {
       })
       .setOrigin(0.5)
       .setDepth(101);
-    console.log("Popup text created");
+    //console.log("Popup text created");
   
     // Add the 'Close' button
     const closeButton = this.add
@@ -376,11 +376,11 @@ harvestPlant(plant) {
       .setInteractive()
       .setDepth(102)
       .on("pointerdown", () => {
-        console.log("Close button clicked");
+        //console.log("Close button clicked");
         this.closePopup(overlay, popupText, closeButton);
       });
-    console.log("Close button created");
-    console.log("Popup displayed");
+    //console.log("Close button created");
+    //console.log("Popup displayed");
   }
 
   closePopup(...elements) {
@@ -403,18 +403,18 @@ harvestPlant(plant) {
   
     // Save to localStorage
     localStorage.setItem("gameState", JSON.stringify(gameState));
-    console.log("Game saved:", gameState);
+    //console.log("Game saved:", gameState);
   }
 
   undoAction() {
-    console.log("Undo Action Triggered");
+    //console.log("Undo Action Triggered");
     if (this.undoStack.length > 0) {
         const lastState = this.undoStack.pop();
         this.redoStack.push(lastState);
 
         switch (lastState.actionType) {
             case "plant":
-                console.log("Undoing Plant Action");
+                //console.log("Undoing Plant Action");
                 const lastPlant = this.plants.getChildren().find(
                     (plant) =>
                         plant.x === lastState.payload.x &&
@@ -424,7 +424,7 @@ harvestPlant(plant) {
                 break;
 
             case "water":
-                console.log("Undoing Water Action");
+                //console.log("Undoing Water Action");
                 const wateredPlant = this.plants.getChildren().find(
                     (plant) =>
                         plant.x === lastState.payload.x &&
@@ -436,7 +436,7 @@ harvestPlant(plant) {
                 break;
 
             case "harvest":
-                console.log("Undoing Harvest Action");
+                //console.log("Undoing Harvest Action");
                 const harvestedPlant = lastState.payload.harvestedPlant;
 
                 // Restore the harvested plant
@@ -477,13 +477,13 @@ harvestPlant(plant) {
                 });
 
                 this.plants.add(restoredPlant);
-                console.log(
-                    `Plant restored at (${restoredPlant.x}, ${restoredPlant.y}) with type ${restoredPlant.plantType} and level ${restoredPlant.level}`
-                );
+                //console.log(
+                //     `Plant restored at (${restoredPlant.x}, ${restoredPlant.y}) with type ${restoredPlant.plantType} and level ${restoredPlant.level}`
+                // );
                 break;
 
             case "progressDay":
-                console.log("Undoing Day Progression");
+                //console.log("Undoing Day Progression");
                 // Restore the previous day value
                 this.day = lastState.day;
                 this.showDay();
@@ -493,22 +493,22 @@ harvestPlant(plant) {
                 break;
 
             default:
-                console.log("Unknown Action Type");
+                //console.log("Unknown Action Type");
         }
     } else {
-        console.log("Undo Stack is Empty");
+        //console.log("Undo Stack is Empty");
     }
 }
 
 redoAction() {
-  console.log("Redo Action Triggered");
+  //console.log("Redo Action Triggered");
   if (this.redoStack.length > 0) {
       const nextState = this.redoStack.pop();
       this.undoStack.push(nextState);
 
       switch (nextState.actionType) {
         case "plant":
-          console.log("Redoing Plant Action");
+          //console.log("Redoing Plant Action");
 
           const plantData = nextState.payload;
 
@@ -529,7 +529,7 @@ redoAction() {
               plantType: plantData.plantType,
           });
 
-          console.log("Plant restored during redo:", plantData);
+          //console.log("Plant restored during redo:", plantData);
 
           // Set the correct sprite frame based on type and level
           switch (redonePlant.plantType) {
@@ -555,7 +555,7 @@ redoAction() {
           break;
 
           case "water":
-              console.log("Redoing Water Action");
+              //console.log("Redoing Water Action");
               const plantToWater = this.plants.getChildren().find(
                   (plant) =>
                       plant.x === nextState.payload.x &&
@@ -567,7 +567,7 @@ redoAction() {
               break;
 
           case "harvest":
-              console.log("Redoing Harvest Action");
+              //console.log("Redoing Harvest Action");
               const harvestedPlant = nextState.payload.harvestedPlant;
 
               // Find and remove the plant again
@@ -577,9 +577,9 @@ redoAction() {
 
               if (plantToRemove) {
                   plantToRemove.destroy();
-                  console.log(
-                      `Plant at (${harvestedPlant.x}, ${harvestedPlant.y}) harvested again.`
-                  );
+                  //console.log(
+                  //     `Plant at (${harvestedPlant.x}, ${harvestedPlant.y}) harvested again.`
+                  // );
               } else {
                   console.error(
                       `Redo failed: No plant found at (${harvestedPlant.x}, ${harvestedPlant.y})`
@@ -588,7 +588,7 @@ redoAction() {
               break;
 
           case "progressDay":
-              console.log("Redoing Day Progression");
+              //console.log("Redoing Day Progression");
 
               // Increment the day count
               this.day = nextState.payload.day + 1;
@@ -599,10 +599,10 @@ redoAction() {
               break;
 
           default:
-              console.log("Unknown Action Type");
+              //console.log("Unknown Action Type");
       }
   } else {
-      console.log("Redo Stack is Empty");
+      //console.log("Redo Stack is Empty");
   }
 }
 
@@ -635,13 +635,13 @@ saveState(actionType, payload) {
       };
   }
 
-  console.log("Saving State:", JSON.stringify(state, null, 2)); // Debug log
+  //console.log("Saving State:", JSON.stringify(state, null, 2)); // Debug log
   this.undoStack.push(state);
   this.redoStack = []; // Clear redo stack on new action
 }
 
 loadState(state) {
-  console.log("Loading State:", state);
+  //console.log("Loading State:", state);
 
   // Update the day
   this.day = state.day;
@@ -680,7 +680,7 @@ loadState(state) {
   } else {
       console.error("No plants data found in state.");
   }
-  console.log("State Loaded: Day and Plants Restored");
+  //console.log("State Loaded: Day and Plants Restored");
 }
 
   restartGameData(){
@@ -691,13 +691,13 @@ loadState(state) {
   }
 
   onPressed(content) {
-    console.log(content);
+    //console.log(content);
   }
 
   createPlant(type, frame, reqs){
     const newPlant = [type, frame, reqs];
     this.availablePlants.push(newPlant);
-    console.log(this.availablePlants);
+    //console.log(this.availablePlants);
   }
   showDay() {
     if (this.dayText) {
@@ -777,17 +777,17 @@ loadState(state) {
 
   newDay() {
     // Save the current state before progressing
-    console.log("Starting a new day...");
+    //console.log("Starting a new day...");
     this.saveState("progressDay", { day: this.day });
 
     // Increment the day
     this.day++;
-    console.log("Incremented day:", this.day);
+    //console.log("Incremented day:", this.day);
     localStorage.setItem("day", this.day);
 
     // Save grid state to localStorage
     const gridState = this.plantGrid.getGrid();
-    console.log("Grid state before saving to localStorage:", gridState);
+    //console.log("Grid state before saving to localStorage:", gridState);
     localStorage.setItem("gridState", JSON.stringify(gridState));
 
     // Update plant requirements and display the day
@@ -804,7 +804,7 @@ checkPlantReq() {
 
 plantCheck(currentTile) {
   return this.plants.getChildren().some((plant) => {
-    const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
+    const plantTile = this.layers["tiledGroundLayer"].getTileAtWorldXY(
       plant.x,
       plant.y
     );
@@ -819,7 +819,7 @@ plantCheck(currentTile) {
   
 
   farmingUpdate() {
-    const tile = this.tiledGroundLayer.getTileAtWorldXY(
+    const tile = this.layers["tiledGroundLayer"].getTileAtWorldXY(
         this.player.x,
         this.player.y
     );
@@ -879,7 +879,7 @@ waterPlant(plant) {
   if (plant) {
     plant.water(); // Use the `water()` method from Plant.js
   } else {
-    console.log("No plant found to water.");
+    //console.log("No plant found to water.");
   }
 }
 

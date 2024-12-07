@@ -4,11 +4,16 @@ function initializeGame(scene) {
 
   const mapConfig = externalConfig.map;
   const playerConfig = externalConfig.player;
+  const layersConfig = externalConfig.map.layers;
 
   /* map */
-  scene.map = scene.add.tilemap("mapJSON");
+  scene.map = scene.add.tilemap(mapConfig.tilemap);
 
   /* tilesets */
+  scene.tilesets = {};
+  for (const [tilesetName, key] of Object.entries(mapConfig.tilesets)) {
+    scene.tilesets[tilesetName] = scene.map.addTilesetImage(tilesetName, key);
+  }
   scene.tiledGround = scene.map.addTilesetImage("TiledGround", "tiledGroundTiles");
   scene.water = scene.map.addTilesetImage("Water", "waterTiles");
   scene.decor = scene.map.addTilesetImage("Decor", "decorTiles");
@@ -18,24 +23,23 @@ function initializeGame(scene) {
   scene.grass = scene.map.addTilesetImage("Grass", "grassTiles");
 
   /* layers */
-  scene.groundLayer = scene.map.createLayer("Grass-n-Paths", [scene.grass, scene.farmTiles], 0, 0);
-  scene.houseLayer = scene.map.createLayer("House", scene.farmTiles, 0, 0);
-  scene.decorLayer = scene.map.createLayer("Decor", [scene.decor, scene.fences, scene.tree], 0, 0);
-  scene.waterLayer = scene.map.createLayer("Water", scene.water, 0, 0);
-  scene.tiledGroundLayer = scene.map.createLayer("Tiled Ground", scene.tiledGround, 0, 0);
+  scene.layers = {};
+  for (const [layer, layerProperties] of Object.entries(layersConfig)) {
+    const requiredTilesets = layerProperties.requiredTilesets.map((tileset) => scene.tilesets[tileset]);
+    console.log(layer);
+    scene.layers[layer] = scene.map.createLayer(layerProperties.name, requiredTilesets, 0, 0);
+    console.log(scene.layers[layer]);
+  }
 
   /*  player  */
   scene.player = new Player(scene, playerConfig);
   scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
 
   /*  collisions  */
-  scene.waterLayer.setCollisionByExclusion([-1]);
-  scene.physics.add.collider(scene.player, scene.waterLayer);
-
-  scene.houseLayer.setCollisionByExclusion([-1]);
-  scene.physics.add.collider(scene.player, scene.houseLayer);
-
-  scene.decorLayer.setCollisionByExclusion([-1]);
-  scene.physics.add.collider(scene.player, scene.decorLayer);
-  scene.plants = scene.add.group();
+  for (const [layer, layerProperties] of Object.entries(layersConfig)) {
+    if (layerProperties.collision.enabled) {
+      scene.layers[layer].setCollisionByExclusion([-1]);
+      scene.physics.add.collider(scene.player, scene.layers[layer]);
+    }
+  }
 }

@@ -1,3 +1,4 @@
+# Starting Condition(Implemented in GameStart.js): load the terrain and the player
 map:
   tilemap: mapJSON
   tilesets:
@@ -12,12 +13,12 @@ map:
   layers:
     groundLayer:
       name: Grass-n-Paths
-      requiredTileset: [grassTiles, farmTiles]
+      requiredTilesets: [Grass, FarmTiles]
       collision: false
 
     houseLayer:
       name: House
-      requiredTileset: [farmTiles]
+      requiredTilesets: [FarmTiles]
       collision:
         enabled: true
         exclude: [-1]
@@ -25,7 +26,7 @@ map:
 
     decorLayer:
       name: Decor
-      requiredTileset: [decorTiles, fencesTiles, treeTiles]
+      requiredTilesets: [Decor, Fences, Tree]
       collision:
         enabled: true
         exclude: [-1]
@@ -33,7 +34,7 @@ map:
 
     waterLayer:
       name: Water
-      requiredTileset: [waterTiles]
+      requiredTilesets: [Water]
       collision:
         enabled: true
         exclude: [-1]
@@ -41,7 +42,7 @@ map:
 
     tiledGroundLayer:
       name: Tiled Ground
-      requiredTileset: [tiledGroundTiles]
+      requiredTilesets: [TiledGround]
       collision: false
 
 player:
