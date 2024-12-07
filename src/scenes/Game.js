@@ -9,7 +9,8 @@ class Game extends Phaser.Scene {
     this.harvestedPlantTypes = new Set(); // Track harvested plant types
     this.activeSaveSlot = 1; // Default to Slot 1
     this.dayManager = new Day(); 
-    this.saveManager = new Saving(); // Initialize Saving instance  
+    this.saveManager = new Saving(); // Initialize Saving instance
+    this.popupManager = null; // Popup manager instance  
   }
 
   create() {
@@ -20,6 +21,7 @@ class Game extends Phaser.Scene {
 
     // Initialize the game based on the active save slot
     this.loadGameSlot(this.activeSaveSlot);
+    this.popupManager = new Popup(this);
 
     /* map */
     this.mapOBJ = new GameStart(this);
@@ -141,6 +143,8 @@ class Game extends Phaser.Scene {
     this.createPlant("wheat", 1, ['sun', 'water', 'neighbor']);
     this.createPlant("plum", 7, ["sun", 'neighbor']);
     this.createPlant("tomato", 13, ["water"]);
+  
+    this.popupManager = new Popup(this); // Initialize Popup manager
   }
 
   loadGameSlot(slot) {
@@ -205,62 +209,8 @@ quickSaveGame() {
 
   // Show Quit Popup
   showQuitPopup() {
-    // Pause the game
-    this.physics.pause();
-  
-    // Get the camera's center
-    const centerX = this.cameras.main.midPoint.x;
-    const centerY = this.cameras.main.midPoint.y;
-  
-    // Create a background overlay for the popup
-    const overlay = this.add
-      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
-      .setOrigin(0.5)
-      .setDepth(100);
-  
-    // Add popup text
-    const popupText = this.add
-      .text(centerX, centerY - 60, t("SAVE_SLOT"), {
-        font: "18px Arial",
-        color: "#ffffff",
-        align: "center",
-      })
-      .setOrigin(0.5)
-      .setDepth(101);
-  
-    // Collect all buttons in an array
-    const slotButtons = [];
-    const slots = [1, 2, 3];
-    slots.forEach((slot, index) => {
-      const slotButton = this.add
-        .text(centerX, centerY - 30 + index * 40, ("SAVE") + `${slot}`, {
-          font: "16px Arial",
-          color: "#ffffff",
-          backgroundColor: "#000000",
-          padding: { x: 10, y: 5 },
-        })
-        .setInteractive()
-        .setOrigin(0.5)
-        .setDepth(102)
-        .on("pointerdown", () => {
-          this.activeSaveSlot = slot;
-  
-          // Check if the slot has saved data
-          const savedData = localStorage.getItem(`gameStateSlot${slot}`);
-          if (savedData) {
-            console.log(`Loading data from slot ${slot}`);
-            this.loadGameSlot(slot); // Load the saved data
-          } else {
-            console.log(`Starting a new game in slot ${slot}`);
-            this.startNewGameState(slot); // Reset to a new state
-          }
-  
-          this.closePopup(overlay, popupText, ...slotButtons); // Close the popup and remove buttons
-        });
-  
-      slotButtons.push(slotButton); // Add the button to the array
-    });
-  }
+    this.popupManager.showSaveSlotPopup();
+}
   
   startNewGameState(slot) {
     const defaultState = {
@@ -300,57 +250,13 @@ harvestPlant(plant) {
   }
 }
 
-  showCompletionPopup() {
-    console.log("Popup triggered");
-  
-    // Pause the game temporarily (remove this line if it causes issues)
-    // this.physics.pause();
-  
-    // Get screen center positions
-    const centerX = this.cameras.main.midPoint.x;
-    const centerY = this.cameras.main.midPoint.y;
-  
-    // Create the popup background
-    const overlay = this.add
-      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
-      .setOrigin(0.5)
-      .setDepth(100)
-      .setStrokeStyle(2, 0xffffff); // Add a border for visibility
-    console.log("Overlay created");
-  
-    // Add popup text
-    const popupText = this.add
-      .text(centerX, centerY - 30, t("HARVESTED_ALL"), {
-        font: "18px Arial",
-        color: "#ffffff",
-        align: "center",
-      })
-      .setOrigin(0.5)
-      .setDepth(101);
-    console.log("Popup text created");
-  
-    // Add the 'Close' button
-    const closeButton = this.add
-      .text(centerX, centerY + 50, "Close", {
-        font: "18px Arial",
-        color: "#ff0000",
-        backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
-      })
-      .setInteractive()
-      .setDepth(102)
-      .on("pointerdown", () => {
-        console.log("Close button clicked");
-        this.closePopup(overlay, popupText, closeButton);
-      });
-    console.log("Close button created");
-    console.log("Popup displayed");
-  }
+showCompletionPopup() {
+  this.popupManager.showHarvestedAllPopup();
+}
 
-  closePopup(...elements) {
-    elements.forEach((element) => element.destroy());
-    this.physics.resume();
-  }
+closePopup(...elements) {
+  this.popupManager.closePopup(...elements);
+}
 
   saveGame() {
     const gameState = {
@@ -677,58 +583,8 @@ restartGameData() {
     }
   }
 
-  showPopup(player, tile) {
-    // Pause the game
-    this.physics.pause();
-
-    // Get the camera's center
-    const centerX = this.cameras.main.midPoint.x;
-    const centerY = this.cameras.main.midPoint.y;
-
-    // Create a background overlay for the popup
-    const overlay = this.add
-      .rectangle(centerX, centerY, 300, 200, 0x000000, 0.7)
-      .setOrigin(0.5);
-      
-
-    // Add text for the popup
-    const popupText = this.add
-      .text(centerX, centerY - 50, t("POPUP_SLEEP"), {
-        font: "20px Arial",
-        color: "#ffffff",
-        align: "center",
-      })
-      .setOrigin(0.5);
-
-    // Create 'Yes' button
-    const yesButton = this.add
-      .text(centerX - 50, centerY + 30, t("YES"), {
-        font: "18px Arial",
-        color: "#00ff00",
-        backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
-      })
-      .setInteractive()
-      .setOrigin(0.5)
-      .on("pointerdown", () => {
-        this.newDay();
-        this.showDay();
-        this.closePopup(overlay, popupText, yesButton, noButton);
-      });
-
-    // Create 'No' button
-    const noButton = this.add
-      .text(centerX + 50, centerY + 30, t("NO"), {
-        font: "18px Arial",
-        color: "#ff0000",
-        backgroundColor: "#000000",
-        padding: { x: 10, y: 5 },
-      })
-      .setInteractive()
-      .setOrigin(0.5)
-      .on("pointerdown", () => {
-        this.closePopup(overlay, popupText, yesButton, noButton);
-      });
+  showPopup() {
+    this.popupManager.showSleepingPopup();
   }
 
   closePopup(...elements) {
