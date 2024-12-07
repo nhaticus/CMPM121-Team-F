@@ -631,7 +631,6 @@ plantCheck(currentTile) {
     );
   });
 }
-  
 
   farmingUpdate() {
     const tile = this.tiledGroundLayer.getTileAtWorldXY(
