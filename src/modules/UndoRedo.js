@@ -1,5 +1,5 @@
 
-function   undoAction(scene) {
+function undoAction(scene) {
     console.log("Undo Action Triggered");
     if (scene.undoStack.length > 0) {
         const lastState = scene.undoStack.pop();
@@ -82,7 +82,7 @@ function   undoAction(scene) {
                 scene.showDay();
 
                 // Restore plant states to the saved state
-                scene.loadState(lastState);
+                loadState(scene, lastState);
                 break;
 
             default:

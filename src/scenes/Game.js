@@ -18,7 +18,7 @@ class Game extends Phaser.Scene {
     setLanguage("en");
 
     // Initialize the game based on the active save slot
-    this.loadGameSlot(this.activeSaveSlot);
+    loadGameSlot(this, this.activeSaveSlot);
 
     /* Initialize Map & Player */
     initializeGame(this);
@@ -101,7 +101,7 @@ class Game extends Phaser.Scene {
       .setInteractive()
       .setDisplaySize(32, 32)
       .on("pointerdown", () => {
-        this.restartGameData();
+        restartGameData();
       })
   
       // Add Save Button
@@ -116,7 +116,7 @@ class Game extends Phaser.Scene {
       .setInteractive() // Makes the image clickable
       .setDisplaySize(64, 32) // Adjust size as needed
       .on("pointerdown", () => {
-        this.saveGame(); // Add functionality to save the game
+        saveGame(this); // Add functionality to save the game
       });
 
       /* quit button  */
@@ -132,7 +132,7 @@ class Game extends Phaser.Scene {
         .setDisplaySize(24, 24)
         .on("pointerdown", () => {
             this.showQuitPopup();
-            this.saveGameSlot(this.activeSaveSlot); // Save to active slot
+            saveGameSlot(this, this.activeSaveSlot); // Save to active slot
         });
         
     //create plants with different requirements (Must have frame in order in spritesheets);
@@ -141,96 +141,13 @@ class Game extends Phaser.Scene {
     this.createPlant("tomato", 13, ["water"]);
   }
 
-  loadGameSlot(slot) {
-    console.log(`Loading game from slot ${slot}...`);
-    const savedData = localStorage.getItem(`gameStateSlot${slot}`);
-    console.log("Retrieved saved data:", savedData);
-
-    if (savedData) {
-        const { day, plants } = JSON.parse(savedData);
-
-        console.log("Day restored:", day);
-        this.day = day || 1;
-        this.showDay();
-
-        if (!this.plantGrid) {
-            const gridWidth = 10; // Adjust to your grid size
-            const gridHeight = 10;
-            this.plantGrid = new PlantGrid(gridWidth, gridHeight);
-            console.log("Initialized a new PlantGrid.");
-        }
-
-        if (!this.plants) {
-            this.plants = this.add.group();
-            console.log("Initialized `this.plants` group.");
-        } else {
-            this.plants.clear(true, true);
-        }
-
-        if (plants && Array.isArray(plants)) {
-            console.log("Restoring plants from save data...");
-            plants.forEach((plantData, index) => {
-                if (plantData) {
-                    console.log(`Restoring plant ${index}:`, plantData);
-                    const plant = new Plant(this, plantData.x, plantData.y, "plant");
-                    Object.assign(plant, plantData);
-
-                    switch (plant.plantType) {
-                        case "wheat":
-                            plant.setFrame(1 + plant.level);
-                            break;
-                        case "plum":
-                            plant.setFrame(7 + plant.level);
-                            break;
-                        case "tomato":
-                            plant.setFrame(13 + plant.level);
-                            break;
-                    }
-
-                    plant.setInteractive().on("pointerdown", () => {
-                        plant.showPlantInfoPopup(this);
-                    });
-
-                    this.plants.add(plant);
-                    this.plantGrid.setPlant(plantData.x, plantData.y, plant);
-                } else {
-                    console.warn(`Missing plant data at index ${index}`);
-                }
-            });
-
-            console.log("PlantGrid updated:", this.plantGrid.getGrid());
-        }
-    } else {
-        console.log(`No saved data found for slot ${slot}. Starting a new game.`);
-        this.startNewGameState(slot);
-    }
-} 
   
-saveGameSlot(slot) {
-  console.log(`Saving game to slot ${slot}...`);
-
-  const gameState = {
-      day: this.day,
-      plants: this.plantGrid.getGrid().map((plant, index) => {
-          if (plant) {
-              console.log(`Saving plant at grid index ${index}:`, plant);
-              return {
-                  x: plant.x,
-                  y: plant.y,
-                  days: plant.days,
-                  water: plant.water,
-                  sun: plant.sun,
-                  level: plant.level,
-                  plantType: plant.plantType,
-              };
-          }
-          return null;
-      }),
-  };
-
-  localStorage.setItem(`gameStateSlot${slot}`, JSON.stringify(gameState));
-  console.log(`Game saved to slot ${slot}:`, gameState);
-}
+  
+closePopup(...elements) {
+  // Destroy all elements passed to the function
+  elements.forEach((element) => element.destroy());
+  this.physics.resume(); // Resume the game after closing the popup
+} 
 
   // Show Quit Popup
   showQuitPopup() {
@@ -278,10 +195,10 @@ saveGameSlot(slot) {
           const savedData = localStorage.getItem(`gameStateSlot${slot}`);
           if (savedData) {
             console.log(`Loading data from slot ${slot}`);
-            this.loadGameSlot(slot); // Load the saved data
+            loadGameSlot(this, slot); // Load the saved data
           } else {
             console.log(`Starting a new game in slot ${slot}`);
-            this.startNewGameState(slot); // Reset to a new state
+            startNewGameState(this, slot); // Reset to a new state
           }
   
           this.closePopup(overlay, popupText, ...slotButtons); // Close the popup and remove buttons
@@ -291,33 +208,7 @@ saveGameSlot(slot) {
     });
   }
   
-  startNewGameState(slot) {
-    // Reset the game to a new state
-    this.day = 1;
-    this.showDay();
-  
-    if (this.plants) {
-      this.plants.clear(true, true); // Clear all plants
-    } else {
-      this.plants = this.add.group();
-    }
-  
-    if (!this.plantGrid) {
-      const gridWidth = 10;
-      const gridHeight = 10;
-      this.plantGrid = new PlantGrid(gridWidth, gridHeight); // Initialize plant grid
-    }
-    this.plantGrid.setGrid([]); // Reset the plant grid
-  
-    // Save the initial state to the selected slot
-    this.saveGameSlot(slot);
-  }
-  
-  closePopup(...elements) {
-    // Destroy all elements passed to the function
-    elements.forEach((element) => element.destroy());
-    this.physics.resume(); // Resume the game after closing the popup
-  } 
+
 
     // Quit Game
 quitGame() {
@@ -388,109 +279,6 @@ harvestPlant(plant) {
     this.physics.resume();
   }
 
-  saveGame() {
-    const gameState = {
-      day: this.day,
-      plants: this.plants.getChildren().map((plant) => ({
-        x: plant.x,
-        y: plant.y,
-        days: plant.days,
-        water: plant.water,
-        sun: plant.sun,
-        level: plant.level,
-      })),
-    };
-  
-    // Save to localStorage
-    localStorage.setItem("gameState", JSON.stringify(gameState));
-    console.log("Game saved:", gameState);
-  }
-
-  
-
-saveState(actionType, payload) {
-  const state = {
-      actionType,   // Type of action (e.g., "plant", "water", "progressDay")
-      payload,      // Action-specific payload (e.g., plant details)
-      day: this.day, // Current day
-      plants: this.plants.getChildren().map((plant) => ({
-        x: plant.x,
-        y: plant.y,
-        level: plant.level,
-        plantType: plant.plantType,
-        days: plant.days,
-        water: plant.water,
-        sun: plant.sun,
-    })),
-    };
-
-  // If action involves plants, save plant-specific data
-  if (actionType === "plant") {
-      state.payload = {
-          x: payload.x,
-          y: payload.y,
-          level: payload.level,
-          days: payload.days,
-          water: payload.water,
-          sun: payload.sun,
-          plantType: payload.plantType, // Save plantType explicitly
-      };
-  }
-
-  console.log("Saving State:", JSON.stringify(state, null, 2)); // Debug log
-  this.undoStack.push(state);
-  this.redoStack = []; // Clear redo stack on new action
-}
-
-loadState(state) {
-  console.log("Loading State:", state);
-
-  // Update the day
-  this.day = state.day;
-  this.showDay(); // Update day text
-
-  // Restore plants
-  this.plants.clear(true, true); // Remove all current plants
-  if (state.plants && Array.isArray(state.plants)) {
-      state.plants.forEach((plantData) => {
-          const plant = new Plant(this, plantData.x, plantData.y, "plant");
-          plant.setPlantTypes(this.availablePlants);
-          Object.assign(plant, plantData); // Restore plant properties
-          
-          // Set the correct sprite frame based on type and level
-          switch (plant.plantType) {
-              case "wheat":
-                  plant.setFrame(1 + plant.level);
-                  break;
-              case "plum":
-                  plant.setFrame(7 + plant.level);
-                  break;
-              case "tomato":
-                  plant.setFrame(13 + plant.level);
-                  break;
-              default:
-                  console.error(`Unknown plant type: ${plant.plantType}`);
-          }
-
-          // Reapply interactivity
-          plant.setInteractive().on("pointerdown", () => {
-              plant.showPlantInfoPopup(this);
-          });
-
-          this.plants.add(plant);
-      });
-  } else {
-      console.error("No plants data found in state.");
-  }
-  console.log("State Loaded: Day and Plants Restored");
-}
-
-  restartGameData(){
-    localStorage.setItem('day', null);
-    localStorage.setItem('plants', null);
-    localStorage.setItem('gridState', null);
-    localStorage.clear();
-  }
 
   onPressed(content) {
     console.log(content);
@@ -580,7 +368,7 @@ loadState(state) {
   newDay() {
     // Save the current state before progressing
     console.log("Starting a new day...");
-    this.saveState("progressDay", { day: this.day });
+    saveState(this, "progressDay", { day: this.day });
 
     // Increment the day
     this.day++;
@@ -662,7 +450,7 @@ addPlant(x, y, texture, level = 0) {
 
   this.plants.add(plant); // Add to Phaser group
   this.plantGrid.addPlant(x, y, plant); // Add to grid using PlantGrid
-  this.saveGameSlot(this.activeSaveSlot); // Save game state
+  saveGameSlot(this, this.activeSaveSlot); // Save game state
   return plant;
 }
 
