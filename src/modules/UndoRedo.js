@@ -79,7 +79,7 @@ function undoAction(scene) {
                 console.log("Undoing Day Progression");
                 // Restore the previous day value
                 scene.day = lastState.day;
-                scene.showDay();
+                showDay(scene);
 
                 // Restore plant states to the saved state
                 loadState(scene, lastState);
@@ -186,7 +186,7 @@ function redoAction(scene){
 
               // Increment the day count
               scene.day = nextState.payload.day + 1;
-              scene.showDay(); // Update day display
+              showDay(scene); // Update day display
 
               // Apply day progression logic to plants
               scene.checkPlantReq(); // Update plant states based on new day

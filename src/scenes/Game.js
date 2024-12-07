@@ -66,7 +66,7 @@ class Game extends Phaser.Scene {
 
     /* day */
     this.day = parseInt(localStorage.getItem('day')) || 1;
-    this.showDay();
+    showDay(this);
 
     /*  house */
     this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
@@ -289,22 +289,6 @@ harvestPlant(plant) {
     this.availablePlants.push(newPlant);
     console.log(this.availablePlants);
   }
-  showDay() {
-    if (this.dayText) {
-      this.dayText.setText(`Day: ${this.day}`);
-    } else {
-      // Create the day text for the first time
-      this.dayText = this.add
-        .text(10, 10, `Day: ${this.day}`, {
-          font: "18px Arial",
-          color: "#ffffff",
-          backgroundColor: "#000000",
-          padding: { x: 5, y: 5 },
-        })
-        .setScrollFactor(0) // Fix the text to the camera view
-        .setDepth(200);
-    }
-  }
 
   showPopup(player, tile) {
     // Pause the game
@@ -340,8 +324,8 @@ harvestPlant(plant) {
       .setInteractive()
       .setOrigin(0.5)
       .on("pointerdown", () => {
-        this.newDay();
-        this.showDay();
+        newDay(this);
+        showDay(this);
         this.closePopup(overlay, popupText, yesButton, noButton);
       });
 
@@ -365,25 +349,7 @@ harvestPlant(plant) {
     this.physics.resume();
   }
 
-  newDay() {
-    // Save the current state before progressing
-    console.log("Starting a new day...");
-    saveState(this, "progressDay", { day: this.day });
 
-    // Increment the day
-    this.day++;
-    console.log("Incremented day:", this.day);
-    localStorage.setItem("day", this.day);
-
-    // Save grid state to localStorage
-    const gridState = this.plantGrid.getGrid();
-    console.log("Grid state before saving to localStorage:", gridState);
-    localStorage.setItem("gridState", JSON.stringify(gridState));
-
-    // Update plant requirements and display the day
-    this.checkPlantReq();
-    this.showDay();
-}
 
 checkPlantReq() {
   this.plants.getChildren().forEach((plant) => {

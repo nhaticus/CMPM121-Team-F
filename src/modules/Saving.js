@@ -9,7 +9,7 @@ function loadGameSlot(scene, slot) {
 
         console.log("Day restored:", day);
         scene.day = day || 1;
-        scene.showDay();
+        showDay(scene);
 
         if (!scene.plantGrid) {
             const gridWidth = 10; // Adjust to your grid size
@@ -67,7 +67,7 @@ function loadGameSlot(scene, slot) {
 function startNewGameState(scene, slot) {
     // Reset the game to a new state
     scene.day = 1;
-    scene.showDay();
+    showDay(scene);
   
     if (scene.plants) {
       scene.plants.clear(true, true); // Clear all plants
@@ -176,7 +176,7 @@ function loadState(scene, state) {
   
     // Update the day
     scene.day = state.day;
-    scene.showDay(); // Update day text
+    showDay(scene); // Update day text
   
     // Restore plants
     scene.plants.clear(true, true); // Remove all current plants
