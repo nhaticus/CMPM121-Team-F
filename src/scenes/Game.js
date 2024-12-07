@@ -9,8 +9,7 @@ class Game extends Phaser.Scene {
     this.harvestedPlantTypes = new Set(); // Track harvested plant types
     this.activeSaveSlot = 1; // Default to Slot 1
     this.dayManager = new Day(); 
-
-    
+    this.saveManager = new Saving(); // Initialize Saving instance  
   }
 
   create() {
@@ -145,92 +144,46 @@ class Game extends Phaser.Scene {
   }
 
   loadGameSlot(slot) {
-    console.log(`Loading game from slot ${slot}...`);
-    const savedData = localStorage.getItem(`gameStateSlot${slot}`);
-    console.log("Retrieved saved data:", savedData);
-
+    const savedData = this.saveManager.loadGame(slot);
+  
     if (savedData) {
-        const { day, plants } = JSON.parse(savedData);
-
-        console.log("Day restored:", day);
-        this.showDay();
-
-        if (!this.plantGrid) {
-            const gridWidth = 10; // Adjust to your grid size
-            const gridHeight = 10;
-            this.plantGrid = new PlantGrid(gridWidth, gridHeight);
-            console.log("Initialized a new PlantGrid.");
+      const { day, plants } = savedData;
+      this.dayManager.day = day || 1; // Restore day
+      this.showDay();
+  
+      this.plants.clear(true, true); // Clear current plants
+      plants.forEach((plantData) => {
+        if (plantData) {
+          const plant = Plant.createFromData(this, plantData);
+          this.plants.add(plant);
+          this.plantGrid.addPlant(plantData.x, plantData.y, plant);
         }
-
-        if (!this.plants) {
-            this.plants = this.add.group();
-            console.log("Initialized `this.plants` group.");
-        } else {
-            this.plants.clear(true, true);
-        }
-
-        if (plants && Array.isArray(plants)) {
-            console.log("Restoring plants from save data...");
-            plants.forEach((plantData, index) => {
-                if (plantData) {
-                    console.log(`Restoring plant ${index}:`, plantData);
-                    const plant = new Plant(this, plantData.x, plantData.y, "plant");
-                    Object.assign(plant, plantData);
-
-                    switch (plant.plantType) {
-                        case "wheat":
-                            plant.setFrame(1 + plant.level);
-                            break;
-                        case "plum":
-                            plant.setFrame(7 + plant.level);
-                            break;
-                        case "tomato":
-                            plant.setFrame(13 + plant.level);
-                            break;
-                    }
-
-                    plant.setInteractive().on("pointerdown", () => {
-                        plant.showPlantInfoPopup(this);
-                    });
-
-                    this.plants.add(plant);
-                    this.plantGrid.setPlant(plantData.x, plantData.y, plant);
-                } else {
-                    console.warn(`Missing plant data at index ${index}`);
-                }
-            });
-
-            console.log("PlantGrid updated:", this.plantGrid.getGrid());
-        }
+      });
     } else {
-        console.log(`No saved data found for slot ${slot}. Starting a new game.`);
-        this.startNewGameState(slot);
+      this.startNewGameState(slot);
     }
-} 
+  }
   
 saveGameSlot(slot) {
-  console.log(`Saving game to slot ${slot}...`);
-
   const gameState = {
-      plants: this.plantGrid.getGrid().map((plant, index) => {
-          if (plant) {
-              console.log(`Saving plant at grid index ${index}:`, plant);
-              return {
-                  x: plant.x,
-                  y: plant.y,
-                  days: plant.days,
-                  water: plant.water,
-                  sun: plant.sun,
-                  level: plant.level,
-                  plantType: plant.plantType,
-              };
-          }
-          return null;
-      }),
+    day: this.dayManager.getCurrentDay(),
+    plants: this.plantGrid.getGrid().map((plant) => {
+      if (plant) {
+        return {
+          x: plant.x,
+          y: plant.y,
+          days: plant.days,
+          water: plant.water,
+          sun: plant.sun,
+          level: plant.level,
+          plantType: plant.plantType,
+        };
+      }
+      return null;
+    }),
   };
 
-  localStorage.setItem(`gameStateSlot${slot}`, JSON.stringify(gameState));
-  console.log(`Game saved to slot ${slot}:`, gameState);
+  this.saveManager.saveGame(slot, gameState); // Delegate to Saving.js
 }
 
   // Show Quit Popup
@@ -293,25 +246,18 @@ saveGameSlot(slot) {
   }
   
   startNewGameState(slot) {
-    // Reset the game to a new state
-    this.day = 1;
+    const defaultState = {
+      day: 1,
+      plants: [],
+    };
+  
+    this.saveManager.startNewGame(slot, defaultState);
+  
+    this.dayManager.day = defaultState.day;
     this.showDay();
   
-    if (this.plants) {
-      this.plants.clear(true, true); // Clear all plants
-    } else {
-      this.plants = this.add.group();
-    }
-  
-    if (!this.plantGrid) {
-      const gridWidth = 10;
-      const gridHeight = 10;
-      this.plantGrid = new PlantGrid(gridWidth, gridHeight); // Initialize plant grid
-    }
-    this.plantGrid.setGrid([]); // Reset the plant grid
-  
-    // Save the initial state to the selected slot
-    this.saveGameSlot(slot);
+    this.plants.clear(true, true);
+    this.plantGrid.clearGrid();
   }
   
   closePopup(...elements) {
