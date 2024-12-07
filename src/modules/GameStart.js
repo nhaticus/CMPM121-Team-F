@@ -1,7 +1,8 @@
-function startGame(scene) {
+function initializeGame(scene) {
   /* map */
   scene.map = scene.add.tilemap("mapJSON");
 
+  /* tilesets */
   scene.tiledGround = scene.map.addTilesetImage("TiledGround", "tiledGroundTiles");
   scene.water = scene.map.addTilesetImage("Water", "waterTiles");
   scene.decor = scene.map.addTilesetImage("Decor", "decorTiles");

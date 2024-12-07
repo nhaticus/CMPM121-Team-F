@@ -21,7 +21,7 @@ class Game extends Phaser.Scene {
     this.loadGameSlot(this.activeSaveSlot);
 
     /* Initialize Map & Player */
-    startGame(this);
+    initializeGame(this);
 
     /* Initialize PlantGrid */
     const gridWidth = 10;
