@@ -1,3 +1,5 @@
+
+
 function newDay(scene) {
     // Save the current state before progressing
     console.log("Starting a new day...");
