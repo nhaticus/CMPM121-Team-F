@@ -186,6 +186,23 @@ saveGameSlot(slot) {
   this.saveManager.saveGame(slot, gameState); // Delegate to Saving.js
 }
 
+quickSaveGame() {
+  const gameState = {
+    day: this.dayManager.getCurrentDay(),
+    plants: this.plants.getChildren().map((plant) => ({
+      x: plant.x,
+      y: plant.y,
+      days: plant.days,
+      water: plant.water,
+      sun: plant.sun,
+      level: plant.level,
+      plantType: plant.plantType,
+    })),
+  };
+
+  this.saveManager.quickSave(gameState); // Delegate to Saving.js
+}
+
   // Show Quit Popup
   showQuitPopup() {
     // Pause the game
@@ -337,7 +354,7 @@ harvestPlant(plant) {
 
   saveGame() {
     const gameState = {
-      day: this.day,
+      day: this.dayManager.getCurrentDay(),
       plants: this.plants.getChildren().map((plant) => ({
         x: plant.x,
         y: plant.y,
@@ -345,11 +362,11 @@ harvestPlant(plant) {
         water: plant.water,
         sun: plant.sun,
         level: plant.level,
+        plantType: plant.plantType,
       })),
     };
   
-    // Save to localStorage
-    localStorage.setItem("gameState", JSON.stringify(gameState));
+    this.saveManager.saveGame(this.activeSaveSlot, gameState); // Delegate to Saving.js
     console.log("Game saved:", gameState);
   }
 

@@ -9,6 +9,11 @@ class Saving {
       localStorage.setItem(key, JSON.stringify(gameState));
       console.log(`Game saved to slot ${slot}:`, gameState);
     }
+
+    quickSave(gameState) {
+        localStorage.setItem(this.quickSaveKey, JSON.stringify(gameState));
+        console.log("Quick save complete:", gameState);
+      }
   
     // Load game state from a specific slot
     loadGame(slot) {
@@ -22,6 +27,18 @@ class Saving {
         return null;
       }
     }
+  
+     // Load quick save state
+  loadQuickSave() {
+    const savedData = localStorage.getItem(this.quickSaveKey);
+    if (savedData) {
+      console.log("Quick save loaded:", JSON.parse(savedData));
+      return JSON.parse(savedData);
+    } else {
+      console.log("No quick save found.");
+      return null;
+    }
+  }
   
     // Start a new game state for a specific slot
     startNewGame(slot, defaultState) {
