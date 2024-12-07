@@ -1,4 +1,10 @@
 function initializeGame(scene) {
+  const externalDSL = scene.cache.text.get("externalConfig");
+  const externalConfig = jsyaml.load(externalDSL);
+
+  const mapConfig = externalConfig.map;
+  const playerConfig = externalConfig.player;
+
   /* map */
   scene.map = scene.add.tilemap("mapJSON");
 
@@ -19,7 +25,7 @@ function initializeGame(scene) {
   scene.tiledGroundLayer = scene.map.createLayer("Tiled Ground", scene.tiledGround, 0, 0);
 
   /*  player  */
-  scene.player = new Player(scene, 500, 500, "player", 0);
+  scene.player = new Player(scene, playerConfig);
   scene.physics.world.setBounds(0, 0, scene.map.widthInPixels, scene.map.heightInPixels);
 
   /*  collisions  */
