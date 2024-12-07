@@ -7,29 +7,31 @@ class Game extends Phaser.Scene {
     this.plantGrid = null;
     this.availablePlants = [];
     this.harvestedPlantTypes = new Set(); // Track harvested plant types
-    this.activeSaveSlot = 1; // Default to Slot 1
+    this.activeSaveSlot = 1; 
     this.dayManager = new Day(); 
-    this.saveManager = new Saving(); // Initialize Saving instance
-    this.popupManager = null; // Popup manager instance  
+    this.saveManager = new Saving();
+    this.popupManager = null;  
   }
 
   create() {
     testFunction();
     console.log(testVar);
     
+    /* Language */
     setLanguage("en");
 
     // Initialize the game based on the active save slot
     this.loadGameSlot(this.activeSaveSlot);
     this.popupManager = new Popup(this);
 
-    /* map */
+    /* Map */
     this.mapOBJ = new GameStart(this);
 
-    /* Initialize PlantGrid */
+    /* PlantGrid */
     const gridWidth = 10;
     const gridHeight = 10;
 
+    /* Local Storage */
     if(localStorage){
       console.log("there is local storage!");
       const savedGrid = localStorage.getItem("gridState");
@@ -45,13 +47,12 @@ class Game extends Phaser.Scene {
     }
     }
     
-    /*  camera  */
+    /*  Camera  */
     this.cameras.main.startFollow(this.player, true, 0.25, 0.25);
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
-    /*  controls  */
+    /*  Controls  */
     this.cursors = this.input.keyboard.createCursorKeys();
-
     this.input.on("pointerdown", (pointer) => {
       // Get the tile at the clicked position in the house layer
       const tile = this.houseLayer.getTileAtWorldXY(
@@ -61,29 +62,30 @@ class Game extends Phaser.Scene {
 
       if (tile) {
         //console.log("Clicked on the house layer! Tile index:", tile.index); // Debug: See which tile was clicked
-        this.showPopup(); // Show popup for any tile in the house layer
+        this.popupManager.showSleepingPopup(); // Delegate to Popup.js
       } else {
         //console.log("No tile found on the house layer at clicked position.");
       }
     });
 
-    /* day */
+    /* Day */
     this.dayManager = new Day();
     this.dayManager.loadDay(); 
     this.showDay();
 
-    /*  house */
+    /*  House */
     this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
     inventorySetup(this);
 
-    /*  buttons  */
+    /*  Buttons  */
     Buttons.create(this);
 
-    //create plants with different requirements (Must have frame in order in spritesheets);
+    /*  Plants  */
     this.createPlant("wheat", 1, ['sun', 'water', 'neighbor']);
     this.createPlant("plum", 7, ["sun", 'neighbor']);
     this.createPlant("tomato", 13, ["water"]);
   
+    /* Popups */
     this.popupManager = new Popup(this); // Initialize Popup manager
   }
 
