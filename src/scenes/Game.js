@@ -1,5 +1,4 @@
 class Game extends Phaser.Scene {
-  
   constructor() {
     super("gameScene");
     this.undoStack = [];
@@ -644,7 +643,6 @@ redoAction() {
 
   update() {
     this.player.update(this.cursors, this);
-
     this.farmingUpdate();
   }
 }
