@@ -18,7 +18,7 @@ class Game extends Phaser.Scene {
     setLanguage("en");
 
     // Initialize the game based on the active save slot
-    loadGameSlot(this, this.activeSaveSlot);
+    this.loadGameSlot(this.activeSaveSlot);
 
     /* Initialize Map & Player */
     initializeGame(this);
@@ -132,7 +132,7 @@ class Game extends Phaser.Scene {
         .setDisplaySize(24, 24)
         .on("pointerdown", () => {
             this.showQuitPopup();
-            saveGameSlot(this, this.activeSaveSlot); // Save to active slot
+            this.saveGameSlot(this.activeSaveSlot); // Save to active slot
         });
         
     //create plants with different requirements (Must have frame in order in spritesheets);
@@ -141,7 +141,96 @@ class Game extends Phaser.Scene {
     this.createPlant("tomato", 13, ["water"]);
   }
 
+  loadGameSlot(slot) {
+    console.log(`Loading game from slot ${slot}...`);
+    const savedData = localStorage.getItem(`gameStateSlot${slot}`);
+    console.log("Retrieved saved data:", savedData);
+
+    if (savedData) {
+        const { day, plants } = JSON.parse(savedData);
+
+        console.log("Day restored:", day);
+        this.day = day || 1;
+        this.showDay();
+
+        if (!this.plantGrid) {
+            const gridWidth = 10; // Adjust to your grid size
+            const gridHeight = 10;
+            this.plantGrid = new PlantGrid(gridWidth, gridHeight);
+            console.log("Initialized a new PlantGrid.");
+        }
+
+        if (!this.plants) {
+            this.plants = this.add.group();
+            console.log("Initialized `this.plants` group.");
+        } else {
+            this.plants.clear(true, true);
+        }
+
+        if (plants && Array.isArray(plants)) {
+            console.log("Restoring plants from save data...");
+            plants.forEach((plantData, index) => {
+                if (plantData) {
+                    console.log(`Restoring plant ${index}:`, plantData);
+                    const plant = new Plant(this, plantData.x, plantData.y, "plant");
+                    Object.assign(plant, plantData);
+
+                    switch (plant.plantType) {
+                        case "wheat":
+                            plant.setFrame(1 + plant.level);
+                            break;
+                        case "plum":
+                            plant.setFrame(7 + plant.level);
+                            break;
+                        case "tomato":
+                            plant.setFrame(13 + plant.level);
+                            break;
+                    }
+
+                    plant.setInteractive().on("pointerdown", () => {
+                        plant.showPlantInfoPopup(this);
+                    });
+
+                    this.plants.add(plant);
+                    this.plantGrid.setPlant(plantData.x, plantData.y, plant);
+                } else {
+                    console.warn(`Missing plant data at index ${index}`);
+                }
+            });
+
+            console.log("PlantGrid updated:", this.plantGrid.getGrid());
+        }
+    } else {
+        console.log(`No saved data found for slot ${slot}. Starting a new game.`);
+        this.startNewGameState(slot);
+    }
+} 
   
+saveGameSlot(slot) {
+  console.log(`Saving game to slot ${slot}...`);
+
+  const gameState = {
+      day: this.day,
+      plants: this.plantGrid.getGrid().map((plant, index) => {
+          if (plant) {
+              console.log(`Saving plant at grid index ${index}:`, plant);
+              return {
+                  x: plant.x,
+                  y: plant.y,
+                  days: plant.days,
+                  water: plant.water,
+                  sun: plant.sun,
+                  level: plant.level,
+                  plantType: plant.plantType,
+              };
+          }
+          return null;
+      }),
+  };
+
+  localStorage.setItem(`gameStateSlot${slot}`, JSON.stringify(gameState));
+  console.log(`Game saved to slot ${slot}:`, gameState);
+}
 
   // Show Quit Popup
   showQuitPopup() {
@@ -189,7 +278,7 @@ class Game extends Phaser.Scene {
           const savedData = localStorage.getItem(`gameStateSlot${slot}`);
           if (savedData) {
             console.log(`Loading data from slot ${slot}`);
-            loadGameSlot(this, slot); // Load the saved data
+            this.loadGameSlot(slot); // Load the saved data
           } else {
             console.log(`Starting a new game in slot ${slot}`);
             this.startNewGameState(slot); // Reset to a new state
@@ -221,7 +310,7 @@ class Game extends Phaser.Scene {
     this.plantGrid.setGrid([]); // Reset the plant grid
   
     // Save the initial state to the selected slot
-    saveGameSlot(this, slot);
+    this.saveGameSlot(slot);
   }
   
   closePopup(...elements) {
@@ -771,7 +860,7 @@ addPlant(x, y, texture, level = 0) {
 
   this.plants.add(plant); // Add to Phaser group
   this.plantGrid.addPlant(x, y, plant); // Add to grid using PlantGrid
-  saveGameSlot(this, this.activeSaveSlot); // Save game state
+  this.saveGameSlot(this.activeSaveSlot); // Save game state
   return plant;
 }
 
