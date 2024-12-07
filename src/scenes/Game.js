@@ -647,12 +647,10 @@ loadState(state) {
   console.log("State Loaded: Day and Plants Restored");
 }
 
-  restartGameData(){
-    localStorage.setItem('day', null);
-    localStorage.setItem('plants', null);
-    localStorage.setItem('gridState', null);
-    localStorage.clear();
-  }
+restartGameData() {
+  this.saveManager.restartGameData(); // Delegate to Saving.js
+  console.log("Game data has been reset.");
+}
 
   onPressed(content) {
     console.log(content);

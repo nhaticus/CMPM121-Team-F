@@ -56,4 +56,13 @@ class Saving {
         }
       }
     }
+    restartGameData() {
+      console.log("Clearing all saved game data...");
+      for (const key in localStorage) {
+        if (key.startsWith(this.localStorageKeyPrefix) || key === this.quickSaveKey) {
+          localStorage.removeItem(key);
+          console.log(`Cleared save data for ${key}`);
+        }
+      }
+    }
   }
