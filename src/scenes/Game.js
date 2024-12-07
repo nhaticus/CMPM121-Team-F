@@ -76,69 +76,9 @@ class Game extends Phaser.Scene {
     this.houseLayer.setTileIndexCallback(10, this.showPopup, this);
     inventorySetup(this);
 
-    /* undo & redo buttons */
-    const undoButton = this.add
-    .image(this.cameras.main.width - 100, 50, 'UndoButton')
-    .setOrigin(0.5)
-    .setScrollFactor(0)
-    .setInteractive()
-    .setDisplaySize(32, 32)
-    .on('pointerdown', () => {
-        this.undoAction(); // Link to undoAction
-    });
+    /*  buttons  */
+    Buttons.create(this);
 
-    // Add Redo Button
-    const redoButton = this.add
-    .image(this.cameras.main.width - 50, 50, 'RedoButton')
-    .setOrigin(0.5)
-    .setScrollFactor(0)
-    .setInteractive()
-    .setDisplaySize(32, 32)
-    .on('pointerdown', () => {
-        this.redoAction(); // Link to redoAction
-    });
-
-    const restartButton = this.add
-      .image(this.cameras.main.width -450, 270, "RestartButton")
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setInteractive()
-      .setDisplaySize(32, 32)
-      .on("pointerdown", () => {
-        this.restartGameData();
-      })
-  
-      // Add Save Button
-      const saveButton = this.add
-      .image(
-        this.cameras.main.width - 50, // X position: near the right edge
-        this.cameras.main.height - 50, // Y position: near the bottom edge
-        "SaveButton" // The key for the save.png image (make sure to preload this key in your Load.js or preload method)
-      )
-      .setOrigin(0.5)
-      .setScrollFactor(0) // Ensures it stays fixed on the screen
-      .setInteractive() // Makes the image clickable
-      .setDisplaySize(64, 32) // Adjust size as needed
-      .on("pointerdown", () => {
-        this.saveGame(); // Add functionality to save the game
-      });
-
-      /* quit button  */
-      const quitButton = this.add
-        .image(
-          this.cameras.main.width - 50, 
-          this.cameras.main.height - 20, 
-          "PauseButton"
-        )
-        .setOrigin(0.5)
-        .setScrollFactor(0)
-        .setInteractive()
-        .setDisplaySize(24, 24)
-        .on("pointerdown", () => {
-            this.showQuitPopup();
-            this.saveGameSlot(this.activeSaveSlot); // Save to active slot
-        });
-        
     //create plants with different requirements (Must have frame in order in spritesheets);
     this.createPlant("wheat", 1, ['sun', 'water', 'neighbor']);
     this.createPlant("plum", 7, ["sun", 'neighbor']);
