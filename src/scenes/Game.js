@@ -13,7 +13,7 @@ class Game extends Phaser.Scene {
 
   create() {
     testFunction();
-    //console.log(testVar);
+    console.log(testVar);
     
     setLanguage("en");
 
@@ -28,16 +28,16 @@ class Game extends Phaser.Scene {
     const gridHeight = 10;
 
     if(localStorage){
-      //console.log("there is local storage!");
+      console.log("there is local storage!");
       const savedGrid = localStorage.getItem("gridState");
-      //console.log(savedGrid);
+      console.log(savedGrid);
       if(savedGrid){
-        //console.log("SAVED GRID");
+        console.log("SAVED GRID");
         this.plantGrid = new PlantGrid(gridWidth, gridHeight);
         this.plantGrid.setGrid(JSON.parse(savedGrid));
       }  
       else{
-        //console.log("making new grid");
+        console.log("making new grid");
         this.plantGrid = new PlantGrid(gridWidth, gridHeight);
     }
     }
@@ -69,7 +69,7 @@ class Game extends Phaser.Scene {
     showDay(this);
 
     /*  house */
-    this.layers["houseLayer"].setTileIndexCallback(10, this.showPopup, this);
+    this.layers["houseLayer"].setTileIndexCallback(10, showPopup, this);
     inventorySetup(this);
 
     /* undo & redo buttons */
@@ -146,7 +146,7 @@ class Game extends Phaser.Scene {
 
     // Quit Game
 quitGame() {
-  //console.log("Game exited");
+  console.log("Game exited");
   // Logic to quit the game (e.g., redirect to the main menu or close the app)
 }
 
@@ -154,22 +154,22 @@ harvestPlant(plant) {
   if (plant) {
     const harvested = plant.harvest(); // Use the `harvest()` method from Plant.js
     if (harvested) {
-      //console.log(`Harvested:`, harvested);
+      console.log(`Harvested:`, harvested);
     }
   } else {
-    //console.log("No plant found to harvest.");
+    console.log("No plant found to harvest.");
   }
 }
 
 
   onPressed(content) {
-    //console.log(content);
+    console.log(content);
   }
 
   createPlant(type, frame, reqs){
     const newPlant = [type, frame, reqs];
     this.availablePlants.push(newPlant);
-    //console.log(this.availablePlants);
+    console.log(this.availablePlants);
   }
 
 checkPlantReq() {
@@ -256,7 +256,7 @@ waterPlant(plant) {
   if (plant) {
     plant.water(); // Use the `water()` method from Plant.js
   } else {
-    //console.log("No plant found to water.");
+    console.log("No plant found to water.");
   }
 }
 
