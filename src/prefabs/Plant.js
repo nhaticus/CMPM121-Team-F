@@ -87,6 +87,41 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.water = 0;
     this.requirementsGenerator();
   }
+ water() {
+  const waterIncrease = Phaser.Math.Between(20, 100);
+  this.water = Math.min(this.water + waterIncrease, 100);
+  console.log(`Plant watered: ${this.water}% (+${waterIncrease}%)`);
+}
+harvest() {
+  if (this.level === 3) {
+    console.log(`Harvesting plant: ${this.plantType}`);
+    return {
+      type: this.plantType,
+      level: this.level,
+      x: this.x,
+      y: this.y,
+    };
+  } else {
+    console.log("Plant is not ready for harvest.");
+    return null;
+  }
+}
+
+static initializeAvailableTypes() {
+  return [
+    ["wheat", 1, ["sun", "water", "neighbor"]],
+    ["plum", 7, ["sun", "neighbor"]],
+    ["tomato", 13, ["water"]],
+  ];
+}
+
+// Create plant from data (e.g., during load)
+static createFromData(scene, data) {
+  const plant = new Plant(scene, data.x, data.y, "plant");
+  Object.assign(plant, data); // Assign saved properties
+  plant.setFrame(data.frameIndex || 0); // Set correct frame
+  return plant;
+}
 
   showPlantInfoPopup(scene) {
     scene.physics.pause();

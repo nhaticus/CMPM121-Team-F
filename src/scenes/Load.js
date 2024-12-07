@@ -14,12 +14,12 @@ class Load extends Phaser.Scene {
     this.load.image("treeTiles", "tilesets/Tree.png");
     this.load.image("waterTiles", "tilesets/Water.png");
 
-     /* button assets */
-     this.load.image('UndoButton', 'tilesets/UndoButton.png');
-     this.load.image('RedoButton', 'tilesets/RedoButton.png');
-     this.load.image("SaveButton", "tilesets/save.png");
-     this.load.image('RestartButton', 'tilesets/RestartButton.png');
-     this.load.image("PauseButton", "tilesets/PauseButton.png");
+    /* button assets */
+    this.load.image("UndoButton", "tilesets/UndoButton.png");
+    this.load.image("RedoButton", "tilesets/RedoButton.png");
+    this.load.image("SaveButton", "tilesets/save.png");
+    this.load.image("RestartButton", "tilesets/RestartButton.png");
+    this.load.image("PauseButton", "tilesets/PauseButton.png");
 
     this.load.tilemapTiledJSON("mapJSON", "map.json");
 
@@ -39,7 +39,7 @@ class Load extends Phaser.Scene {
     this.load.spritesheet("inventory", "spritesheets/inventory.png", {
       frameWidth: 32,
       frameHeight: 32,
-    })
+    });
   }
   create() {
     /* player's down animation */
