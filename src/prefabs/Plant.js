@@ -2,15 +2,14 @@
 class Plant extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, texture) {
     super(scene, x, y, texture);
-  
+
     scene.add.existing(this);
     scene.physics.world.enable(this);
-    
+
     this.setOrigin(0.5);
-  
+
     /* Randomize plant type */
 
-  
     /* Some global variables */
     this.neightbor = 0;
     this.water = 0;
@@ -18,13 +17,11 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.days = 0;
     this.level = 0;
     this.sun = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
-  
-    this.requirements = "";
-  
 
+    this.requirements = "";
   }
 
-  setPlantTypes(availablePlants){
+  setPlantTypes(availablePlants) {
     console.log(availablePlants);
     const thisPlant = availablePlants[Phaser.Math.Between(0, availablePlants.length - 1)];
 
@@ -36,7 +33,6 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.setFrame(thisPlant[1]);
 
     this.requirementsGenerator(thisPlant[2]);
-    
   }
 
   /*  WHEAT SPRITESHEET INDEXES
@@ -57,37 +53,15 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       14 - Produce
   */
 
-      setPlantType(x) {
-        switch (x) {
-          case 1:
-            this.plantType = "wheat";
-            this.setFrame(1);
-            break;
-          case 2:
-            this.plantType = "plum";
-            this.setFrame(7);
-            break;
-          case 3:
-            this.plantType = "tomato";
-            this.setFrame(13);
-            break;
-          default:
-            this.plantType = ""; // Default case for safety
-            break;
-        }
-
-      }
-
-
-      grow() {
-        if (this.level === 3) {
-          return;
-        }
-        this.level++;
-        this.setFrame(this.frame.name + 1);
-        this.water = 0;
-        this.requirementsGenerator();
-      }
+  grow() {
+    if (this.level === 3) {
+      return;
+    }
+    this.level++;
+    this.setFrame(this.frame.name + 1);
+    this.water = 0;
+    this.requirementsGenerator();
+  }
 
   showPlantInfoPopup(scene) {
     scene.physics.pause();
@@ -97,20 +71,13 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     const popupWidth = 300;
     const popupHeight = 200;
 
-    const overlay = scene.add
-      .rectangle(centerX, centerY, popupWidth, popupHeight, 0x000000, 0.7)
-      .setOrigin(0.5)
-      .setDepth(2);
+    const overlay = scene.add.rectangle(centerX, centerY, popupWidth, popupHeight, 0x000000, 0.7).setOrigin(0.5).setDepth(2);
 
     const popupText = scene.add
       .text(
         centerX,
         centerY - popupHeight / 2, // Position text at the top of the popup
-        t("DAYS_PLANTED") +this.days +
-        "%\n" + t("WATER_LEVEL") + this.water +
-          "%\n" + t("CURRENT_SUNLIGHT") + this.sun +
-          "%\n" + t("REQUIREMENTS") + this.requirements +
-          "\n" + t("PLANT_LEVEL") + this.level,
+        t("DAYS_PLANTED") + this.days + "%\n" + t("WATER_LEVEL") + this.water + "%\n" + t("CURRENT_SUNLIGHT") + this.sun + "%\n" + t("REQUIREMENTS") + this.requirements + "\n" + t("PLANT_LEVEL") + this.level,
         {
           font: "14px Arial",
           color: "#ffffff",
@@ -124,30 +91,24 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     const buttonYOffset = popupHeight / 2 - 40;
 
     const harvestButton = scene.add
-  .text(centerX - 80, centerY + buttonYOffset, t("HARVEST"), {
-    font: "14px Arial",
-    color: "#ffffff",
-    backgroundColor: "#00ff00",
-    padding: { x: 8, y: 4 },
-  })
-  .setInteractive()
-  .setOrigin(0.5)
-  .setDepth(2)
-  .on("pointerdown", () => {
-    if (this.level === 3) {
-      console.log(`Harvest button clicked for plant type: ${this.plantType}`); // Debugging log
-      scene.harvestPlant(this); // Delegate harvesting logic to Game.js
-      closePopup(scene,
-        overlay,
-        popupText,
-        harvestButton,
-        waterButton,
-        closeButton
-      );
-    } else {
-      console.log("Plant is not fully grown; cannot harvest.");
-    }
-  });
+      .text(centerX - 80, centerY + buttonYOffset, t("HARVEST"), {
+        font: "14px Arial",
+        color: "#ffffff",
+        backgroundColor: "#00ff00",
+        padding: { x: 8, y: 4 },
+      })
+      .setInteractive()
+      .setOrigin(0.5)
+      .setDepth(2)
+      .on("pointerdown", () => {
+        if (this.level === 3) {
+          console.log(`Harvest button clicked for plant type: ${this.plantType}`); // Debugging log
+          scene.harvestPlant(this); // Delegate harvesting logic to Game.js
+          closePopup(scene, overlay, popupText, harvestButton, waterButton, closeButton);
+        } else {
+          console.log("Plant is not fully grown; cannot harvest.");
+        }
+      });
 
     const waterButton = scene.add
       .text(centerX + 80, centerY + buttonYOffset, t("WATER"), {
@@ -163,18 +124,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
         // Call the waterPlant method to water the plant and save its state
         scene.waterPlant(this);
 
-        popupText.setText(
-          "Days Planted: " +
-            this.days +
-            "\nWater Level: " +
-            this.water +
-            "%\nCurrent Sunlight: " +
-            this.sun +
-            "%\nRequirements: " +
-            this.requirements +
-            "\nPlant Level: " +
-            this.level
-        );
+        popupText.setText("Days Planted: " + this.days + "\nWater Level: " + this.water + "%\nCurrent Sunlight: " + this.sun + "%\nRequirements: " + this.requirements + "\nPlant Level: " + this.level);
       });
 
     const closeButton = scene.add
@@ -188,13 +138,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       .setInteractive()
       .setDepth(2)
       .on("pointerdown", () => {
-        closePopup(scene,
-          overlay,
-          popupText,
-          harvestButton,
-          waterButton,
-          closeButton
-        );
+        closePopup(scene, overlay, popupText, harvestButton, waterButton, closeButton);
       });
   }
 
@@ -204,24 +148,21 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   }
 
   requirementsGenerator(reqs) {
-    if(reqs.includes("sun")){
+    if (reqs.includes("sun")) {
       this.sunReq = Phaser.Math.Between(5, 20) * 5;
-    }
-    else{
+    } else {
       this.sunReq = 0;
     }
-    if(reqs.includes("water")){
+    if (reqs.includes("water")) {
       this.waterReq = Phaser.Math.Between(5, 20) * 5;
-    }
-    else{
+    } else {
       this.waterReq = 0;
     }
-    if(reqs.includes("neighbor")){
+    if (reqs.includes("neighbor")) {
       if (this.level === 0) {
         this.neighborReq = Phaser.Math.Between(2, 8);
       }
-    }
-    else{
+    } else {
       this.neighborReq = 0;
     }
     this.requirements = `\n` + t("WATER_REQ") + `${this.waterReq}% \n` + t("SURROUND") + `${this.neighborReq} \n` + t("SUN_REQ") + `${this.sunReq}`;

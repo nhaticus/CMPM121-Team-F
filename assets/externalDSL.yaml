@@ -1,3 +1,4 @@
+# Starting Condition(Implemented in GameStart.js): load the terrain and the player
 map:
   tilemap: mapJSON
   tilesets:
@@ -12,12 +13,12 @@ map:
   layers:
     groundLayer:
       name: Grass-n-Paths
-      requiredTileset: [grassTiles, farmTiles]
+      requiredTilesets: [Grass, FarmTiles]
       collision: false
 
     houseLayer:
       name: House
-      requiredTileset: [farmTiles]
+      requiredTilesets: [FarmTiles]
       collision:
         enabled: true
         exclude: [-1]
@@ -25,7 +26,7 @@ map:
 
     decorLayer:
       name: Decor
-      requiredTileset: [decorTiles, fencesTiles, treeTiles]
+      requiredTilesets: [Decor, Fences, Tree]
       collision:
         enabled: true
         exclude: [-1]
@@ -33,7 +34,7 @@ map:
 
     waterLayer:
       name: Water
-      requiredTileset: [waterTiles]
+      requiredTilesets: [Water]
       collision:
         enabled: true
         exclude: [-1]
@@ -41,7 +42,7 @@ map:
 
     tiledGroundLayer:
       name: Tiled Ground
-      requiredTileset: [tiledGroundTiles]
+      requiredTilesets: [TiledGround]
       collision: false
 
 player:
@@ -59,3 +60,36 @@ player:
     widthFactor: 0.5
     heightFactor: 0.67
 
+# Plants
+plants:
+  texture: plant
+  wheat:
+    frame:
+      0: seed
+      1: level 1
+      2: level 2
+      3: level 3
+      4: produce
+      5: item
+  plum:
+    frame:
+      6: seed
+      7: level 1
+      8: level 2
+      9: level 3
+      10: produce
+      11: item
+  tomato:
+    frame:
+      11: seed
+      12: level 1
+      13: level 2
+      14: level 3
+      15: produce
+      16: item
+
+# A play scenario ends when the player has collected all of the plants
+winScenario:
+  conditions:
+    allPlantsCollected: false
+  requiredPlants: [plum, wheat, tomato]

@@ -6,24 +6,30 @@
     <title>Team F Game</title>
   </head>
   <body>
+    <!-- Libraries -->
     <script src="/lib/phaser.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
-    <script src="/src/prefabs/Player.js"></script>
-    <script src="/src/prefabs/Plant.js"></script>
-    <script src="/src/prefabs/Inventory.js"></script>
-    <script src="/src/prefabs/PlantGrid.js"></script>
+    <script src="/localization.js"></script>
 
-    <script src="/src/modules/test.js"></script>
-    <script src="src/modules/inventorySetup.js"></script>
-    <script src="src/modules/UndoRedo.js"></script>
+    <!-- Modules -->
     <script src="src/modules/Day.js"></script>
+    <script src="src/modules/GameStart.js"> </script>
+    <script src="src/modules/inventorySetup.js"></script>
     <script src="src/modules/Popup.js"></script>
     <script src="src/modules/Saving.js"></script>
+    <script src="src/modules/UndoRedo.js"></script>
 
+    <!-- Prefabs -->
+    <script src="/src/prefabs/Inventory.js"></script>
+    <script src="/src/prefabs/Plant.js"></script>
+    <script src="/src/prefabs/PlantGrid.js"></script>
+    <script src="/src/prefabs/Player.js"></script>
+
+    <!-- Scenes -->
     <script src="/src/scenes/Load.js"></script>
-    <script src="/localization.js"></script>
-    <script src="src\modules\GameStart.js"></script>
     <script src="/src/scenes/Game.js"></script>
+
+    <!-- Main -->
     <script src="/src/main.js"></script>
   </body>
 </html>
