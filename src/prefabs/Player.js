@@ -1,4 +1,5 @@
 class Player extends Phaser.Physics.Arcade.Sprite {
+
   constructor(scene, playerConfig) {
     super(scene, playerConfig.position.x, playerConfig.position.y, playerConfig.texture, playerConfig.frame);
 
@@ -7,11 +8,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     /* reduce hitbox size */
     this.setBodySize(this.width / 2, this.height / 1.5);
-
     this.setCollideWorldBounds(true);
 
     this.setDepth(playerConfig.depth);
-
     this.playerDirection = playerConfig.direction;
     this.playerSpeed = playerConfig.speed;
   }
