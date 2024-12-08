@@ -151,14 +151,33 @@ quitGame() {
 }
 
 harvestPlant(plant) {
-  if (plant) {
-    const harvested = plant.harvest(); // Use the `harvest()` method from Plant.js
-    if (harvested) {
-      console.log(`Harvested:`, harvested);
+  console.log(`Attempting to harvest plant with type: ${plant.plantType}`);
+
+  // Save the state before destroying the plant
+  saveState(this, "harvest", {
+      x: plant.x,
+      y: plant.y,
+      harvestedPlant: {
+          x: plant.x,
+          y: plant.y,
+          plantType: plant.plantType, // Save the type
+          days: plant.days,
+          water: plant.water,
+          sun: plant.sun,
+          level: plant.level, // Save the level explicitly
+      },
+  });
+  // Add plant type to harvested set
+  this.harvestedPlantTypes.add(plant.plantType);
+  console.log("Harvested Plant Types:", Array.from(this.harvestedPlantTypes));
+
+  // Check if all plant types have been harvested
+  const allPlantTypes = ["wheat", "plum", "tomato"]; // Define all possible plant types
+  if (allPlantTypes.every(type => this.harvestedPlantTypes.has(type))) {
+      this.showCompletionPopup();
     }
-  } else {
-    console.log("No plant found to harvest.");
-  }
+    plant.destroy();
+    console.log(`${plant.plantType} at (${plant.x}, ${plant.y}) harvested.`);
 }
 
 
@@ -171,28 +190,54 @@ harvestPlant(plant) {
     this.availablePlants.push(newPlant);
     console.log(this.availablePlants);
   }
+  checkPlantReq() {
+    const surroundingTiles = [
+      { x: -1, y: -1 },
+      { x: 0, y: -1 },
+      { x: 1, y: -1 },
+      { x: -1, y: 0 },
+      { x: 1, y: 0 },
+      { x: -1, y: 1 },
+      { x: 0, y: 1 },
+      { x: 1, y: 1 },
+    ];
+    this.plants.getChildren().forEach((plant) => {
+      let surroundingPlants = 0;
 
-checkPlantReq() {
-  this.plants.getChildren().forEach((plant) => {
-    const neighbors = this.plantGrid.getNeighbors(plant.x, plant.y).length;
-    plant.newDay(neighbors); // Pass neighbor count to the plant
-  });
-}
+      surroundingTiles.forEach((offset) => {
+        const tileX = plant.x + offset.x * 16;
+        const tileY = plant.y + offset.y * 16;
+        const tile = this.tiledGroundLayer.getTileAtWorldXY(tileX, tileY);
 
-plantCheck(currentTile) {
-  return this.plants.getChildren().some((plant) => {
-    const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
-      plant.x,
-      plant.y
-    );
+        if (tile) {
+          // console.log(`Tile found at (${tileX}, ${tileY})`);
+          if (this.plantCheck(tile)) {
+            surroundingPlants++;
+          }
+        }
+      });
 
-    return (
-      plantTile &&
-      plantTile.x === currentTile.x &&
-      plantTile.y === currentTile.y
-    );
-  });
-}
+            /* calls a function that will check if the surrounding plants matches with required plants */
+      plant.newDay(surroundingPlants);
+
+    });
+  }
+
+  plantCheck(currentTile) {
+    return this.plants.getChildren().some((plant) => {
+      const plantTile = this.tiledGroundLayer.getTileAtWorldXY(
+        plant.x,
+        plant.y
+      );
+
+      return (
+        plantTile &&
+        plantTile.x === currentTile.x &&
+        plantTile.y === currentTile.y
+      );
+    });
+  }
+
   
 
   farmingUpdate() {
@@ -227,17 +272,36 @@ plantCheck(currentTile) {
 }
 
 addPlant(x, y, texture, level = 0) {
-  const plantData = { x, y, level, water: 0, sun: 0, plantType: null, frameIndex: 0 };
-  const plant = Plant.createFromData(this, plantData);
+  const plant = new Plant(this, x, y, texture);
 
   plant.setPlantTypes(this.availablePlants);
+  plant.level = level;
+  plant.days = 0;
+  plant.water = 0;
+  plant.sun = 0;
+
+  switch (plant.plantType) {
+      case "wheat":
+          plant.setFrame(1 + plant.level);
+          break;
+      case "plum":
+          plant.setFrame(7 + plant.level);
+          break;
+      case "tomato":
+          plant.setFrame(13 + plant.level);
+          break;
+  }
   plant.setInteractive().on("pointerdown", () => {
     plant.showPlantInfoPopup(this);
   });
 
-  this.plants.add(plant); // Add to Phaser group
-  this.plantGrid.addPlant(x, y, plant); // Add to grid using PlantGrid
-  saveGameSlot(this, this.activeSaveSlot); // Save game state
+  // Add plant to the group and grid
+  this.plants.add(plant);
+  this.plantGrid.setPlant(x, y, plant);
+
+  // Save game after adding a plant
+  saveGameSlot(this, this.activeSaveSlot);
+
   return plant;
 }
 
@@ -253,11 +317,18 @@ growPlant(x, y) {
 
 }
 waterPlant(plant) {
-  if (plant) {
-    plant.water(); // Use the `water()` method from Plant.js
-  } else {
-    console.log("No plant found to water.");
-  }
+  const randomWaterIncrease = Phaser.Math.Between(20, 100);
+
+  // Save the watering action
+  saveState(this, "water", {
+    x: plant.x,
+    y: plant.y,
+    previousWater: plant.water,
+    newWater: Math.min(plant.water + randomWaterIncrease, 100),
+  });
+
+  plant.water = Math.min(plant.water + randomWaterIncrease, 100);
+  console.log(`Plant watered: ${plant.water} (+${randomWaterIncrease})`);
 }
 
   update() {
