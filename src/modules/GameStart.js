@@ -14,13 +14,6 @@ function initializeGame(scene) {
   for (const [tilesetName, key] of Object.entries(mapConfig.tilesets)) {
     scene.tilesets[tilesetName] = scene.map.addTilesetImage(tilesetName, key);
   }
-  scene.tiledGround = scene.map.addTilesetImage("TiledGround", "tiledGroundTiles");
-  scene.water = scene.map.addTilesetImage("Water", "waterTiles");
-  scene.decor = scene.map.addTilesetImage("Decor", "decorTiles");
-  scene.fences = scene.map.addTilesetImage("Fences", "fencesTiles");
-  scene.tree = scene.map.addTilesetImage("Tree", "treeTiles");
-  scene.farmTiles = scene.map.addTilesetImage("FarmTiles", "farmTiles");
-  scene.grass = scene.map.addTilesetImage("Grass", "grassTiles");
 
   /* layers */
   scene.layers = {};
