@@ -5,6 +5,9 @@ class Load extends Phaser.Scene {
   preload() {
     this.load.path = "./assets/";
 
+    /*  external config file  */
+    this.load.text("externalConfig", "externalDSL.yaml");
+
     /*  map assets  */
     this.load.image("decorTiles", "tilesets/Decor.png");
     this.load.image("farmTiles", "tilesets/FarmTiles.png");

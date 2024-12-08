@@ -1,15 +1,18 @@
 class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, texture, frame) {
-    super(scene, x, y, texture, frame);
+
+  constructor(scene, playerConfig) {
+    super(scene, playerConfig.position.x, playerConfig.position.y, playerConfig.texture, playerConfig.frame);
+
     scene.add.existing(this);
     scene.physics.world.enable(this);
 
     /* reduce hitbox size */
     this.setBodySize(this.width / 2, this.height / 1.5);
     this.setCollideWorldBounds(true);
-    this.setDepth(1);
-    this.playerDirection = "down";
-    this.playerSpeed = 100;
+
+    this.setDepth(playerConfig.depth);
+    this.playerDirection = playerConfig.direction;
+    this.playerSpeed = playerConfig.speed;
   }
 
   update(cursors, scene) {
@@ -20,10 +23,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       playerVector.x = -1;
       this.playerDirection = "left";
       this.flipX = true;
-    } else if (
-      cursors.right.isDown ||
-      scene.input.keyboard.addKey("D").isDown
-    ) {
+    } else if (cursors.right.isDown || scene.input.keyboard.addKey("D").isDown) {
       playerVector.x = 1;
       this.playerDirection = "right";
       this.flipX = false;
@@ -40,13 +40,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     playerVector.normalize();
     let playerMovement;
 
-    this.setVelocity(
-      playerVector.x * this.playerSpeed,
-      playerVector.y * this.playerSpeed
-    );
-    playerVector.length()
-      ? (playerMovement = "run")
-      : (playerMovement = "idle");
+    this.setVelocity(playerVector.x * this.playerSpeed, playerVector.y * this.playerSpeed);
+    playerVector.length() ? (playerMovement = "run") : (playerMovement = "idle");
     this.play(playerMovement + "-" + this.playerDirection, true);
   }
 }

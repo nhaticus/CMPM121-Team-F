@@ -1,0 +1,62 @@
+# Starting Condition(Implemented in GameStart.js): load the terrain and the player
+map:
+  tilemap: mapJSON
+  tilesets:
+    TiledGround: tiledGroundTiles
+    Water: waterTiles
+    Decor: decorTiles
+    Fences: fencesTiles
+    Tree: treeTiles
+    FarmTiles: farmTiles
+    Grass: grassTiles
+
+  layers:
+    groundLayer:
+      name: Grass-n-Paths
+      requiredTilesets: [Grass, FarmTiles]
+      collision: false
+
+    houseLayer:
+      name: House
+      requiredTilesets: [FarmTiles]
+      collision:
+        enabled: true
+        exclude: [-1]
+        collidesWith: [player]
+
+    decorLayer:
+      name: Decor
+      requiredTilesets: [Decor, Fences, Tree]
+      collision:
+        enabled: true
+        exclude: [-1]
+        collidesWith: [player]
+
+    waterLayer:
+      name: Water
+      requiredTilesets: [Water]
+      collision:
+        enabled: true
+        exclude: [-1]
+        collidesWith: [player]
+
+    tiledGroundLayer:
+      name: Tiled Ground
+      requiredTilesets: [TiledGround]
+      collision: false
+
+player:
+  position:
+    x: 500
+    y: 500
+  texture: player
+  frame: 0
+  depth: 1 # make sure player is drawn on top of everything else (mainly the plants)
+  speed: 100
+  direction: down
+  collideWorldBounds: true
+  hitboxSize:
+    # reduce hit box to match the actual sprite instead of its bounding box
+    widthFactor: 0.5
+    heightFactor: 0.67
+

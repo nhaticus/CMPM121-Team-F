@@ -23,8 +23,10 @@ class Game extends Phaser.Scene {
     this.loadGameSlot(this.activeSaveSlot);
     this.popupManager = new Popup(this);
 
-    /* Map */
-    this.mapOBJ = new GameStart(this);
+
+    /* Initialize Map & Player */
+    initializeGame(this);
+
 
     /* PlantGrid */
     const gridWidth = 10;
@@ -54,13 +56,15 @@ class Game extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.on("pointerdown", (pointer) => {
       // Get the tile at the clicked position in the house layer
-      const tile = this.houseLayer.getTileAtWorldXY(
+      const tile = this.layers["houseLayer"].getTileAtWorldXY(
         pointer.worldX,
         pointer.worldY
       );
       if (tile) {
         //console.log("Clicked on the house layer! Tile index:", tile.index); // Debug: See which tile was clicked
+
         this.popupManager.showSleepingPopup(); // Delegate to Popup.js
+
       } else {
         //console.log("No tile found on the house layer at clicked position.");
       }
@@ -79,6 +83,7 @@ class Game extends Phaser.Scene {
     Buttons.create(this);
 
     /*  Plants  */
+
     this.createPlant("wheat", 1, ['sun', 'water', 'neighbor']);
     this.createPlant("plum", 7, ["sun", 'neighbor']);
     this.createPlant("tomato", 13, ["water"]);
@@ -86,6 +91,7 @@ class Game extends Phaser.Scene {
     /* Popups */
     this.popupManager = new Popup(this); // Initialize Popup manager
   }
+
 
   /* Save/Load  */
   loadGameSlot(slot) {
@@ -285,7 +291,7 @@ closePopup(...elements) {
     this.plants.clear(true, true);
     this.plantGrid.clearGrid();
   }
-  
+
 quitGame() {
   console.log("Game exited");
   // Logic to quit the game (e.g., redirect to the main menu or close the app)
@@ -294,7 +300,7 @@ restartGameData() {
   this.saveManager.restartGameData(); 
   console.log("Game data has been reset.");
 }
-  
+
 /* Undo/Redo */
   undoAction() {
     console.log("Undo Action Triggered");
@@ -496,7 +502,6 @@ redoAction() {
   }
 }
 
-
   onPressed(content) {
     console.log(content);
   }
@@ -609,9 +614,10 @@ redoAction() {
     this.showDay();
   }
 
+
 /* Update */
   farmingUpdate() {
-    const tile = this.tiledGroundLayer.getTileAtWorldXY(
+    const tile = this.layers["tiledGroundLayer"].getTileAtWorldXY(
         this.player.x,
         this.player.y
     );
@@ -640,6 +646,7 @@ redoAction() {
         }
     }
 }
+
 
   update() {
     this.player.update(this.cursors, this);
