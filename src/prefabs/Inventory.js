@@ -1,11 +1,11 @@
 class Inventory extends Phaser.GameObjects.Sprite {
     constructor(config){
         if(!config.scene){
-            console.log('missing scene');
+            //console.log('missing scene');
             return;
         }
         if(!config.key){
-            console.log('missing key');
+            //console.log('missing key');
             return;
         }
         if(!config.up){
@@ -51,16 +51,16 @@ class Inventory extends Phaser.GameObjects.Sprite {
     }
 
     onDown(){
-        console.log("down")
+        //console.log("down")
         this.setFrame(this.config.down);
     }
 
     onOver(){
-        console.log("over");
+        //console.log("over");
         this.setFrame(this.config.over);
     }
     onUp(){
-        console.log("up");
+        //console.log("up");
         this.setFrame(this.config.up);
     }
 }

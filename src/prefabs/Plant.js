@@ -16,15 +16,21 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
     this.sun = 0;
     this.days = 0;
     this.level = 0;
-    this.sun = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+    this.sun = 0;
 
     this.requirements = "";
+
+    this.requirementsList = "";
+
+    this.setInteractive().on("pointerdown", () => {
+      this.showPlantInfoPopup(scene);
+    });
   }
 
   setPlantTypes(availablePlants) {
     console.log(availablePlants);
     const thisPlant = availablePlants[Phaser.Math.Between(0, availablePlants.length - 1)];
-
+    this.requirementsList = thisPlant[2];
     this.plantType = thisPlant[0];
     console.log("PLANT TYPE" + this.plantType);
 
@@ -32,7 +38,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
 
     this.setFrame(thisPlant[1]);
 
-    this.requirementsGenerator(thisPlant[2]);
+    this.requirementsGenerator(this.requirementsList);
   }
 
   /*  WHEAT SPRITESHEET INDEXES
@@ -53,16 +59,6 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       14 - Produce
   */
 
-  grow() {
-    if (this.level === 3) {
-      return;
-    }
-    this.level++;
-    this.setFrame(this.frame.name + 1);
-    this.water = 0;
-    this.requirementsGenerator();
-  }
-
   showPlantInfoPopup(scene) {
     scene.physics.pause();
     const centerX = scene.cameras.main.midPoint.x;
@@ -77,7 +73,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       .text(
         centerX,
         centerY - popupHeight / 2, // Position text at the top of the popup
-        t("DAYS_PLANTED") + this.days + "%\n" + t("WATER_LEVEL") + this.water + "%\n" + t("CURRENT_SUNLIGHT") + this.sun + "%\n" + t("REQUIREMENTS") + this.requirements + "\n" + t("PLANT_LEVEL") + this.level,
+        t("DAYS_PLANTED") + this.days + "\n" + t("WATER_LEVEL") + this.water + "%\n" + t("CURRENT_SUNLIGHT") + this.sun + "%\n" + t("REQUIREMENTS") + this.requirements + "\n" + t("PLANT_LEVEL") + this.level,
         {
           font: "14px Arial",
           color: "#ffffff",
@@ -102,8 +98,8 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       .setDepth(2)
       .on("pointerdown", () => {
         if (this.level === 3) {
-          console.log(`Harvest button clicked for plant type: ${this.plantType}`); // Debugging log
-          scene.harvestPlant(this); // Delegate harvesting logic to Game.js
+          this.harvestPlant(scene);
+          // console.log(`Harvest button clicked for plant type: ${this.plantType}`); // Debugging log
           closePopup(scene, overlay, popupText, harvestButton, waterButton, closeButton);
         } else {
           console.log("Plant is not fully grown; cannot harvest.");
@@ -121,8 +117,7 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
       .setOrigin(0.5)
       .setDepth(2)
       .on("pointerdown", () => {
-        // Call the waterPlant method to water the plant and save its state
-        scene.waterPlant(this);
+        this.waterPlant(scene);
 
         popupText.setText("Days Planted: " + this.days + "\nWater Level: " + this.water + "%\nCurrent Sunlight: " + this.sun + "%\nRequirements: " + this.requirements + "\nPlant Level: " + this.level);
       });
@@ -145,6 +140,16 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   closePopup(...elements) {
     elements.forEach((element) => element.destroy());
     this.physics.resume();
+  }
+
+  grow() {
+    if (this.level === 3) {
+      return;
+    }
+    this.level++;
+    this.setFrame(this.frame.name + 1);
+    this.water = 0;
+    this.requirementsGenerator(this.requirementsList);
   }
 
   requirementsGenerator(reqs) {
@@ -192,5 +197,50 @@ class Plant extends Phaser.Physics.Arcade.Sprite {
   fullyGrowPlant() {
     this.level = 3;
     this.setFrame(this.frame.name + 3);
+  }
+
+  waterPlant(scene) {
+    const randomWaterIncrease = Phaser.Math.Between(1, 10) * 5; //multiple of 5 so its 5 - 50
+
+    // Save the watering action
+    saveState(scene, "water", {
+      x: this.x,
+      y: this.y,
+      previousWater: this.water,
+      newWater: Math.min(this.water + randomWaterIncrease, 100),
+    });
+
+    this.water = Math.min(this.water + randomWaterIncrease, 100);
+    console.log(`Plant watered: ${this.water} (+${randomWaterIncrease})`);
+  }
+
+  harvestPlant(scene) {
+    console.log(`Attempting to harvest plant with type: ${this.plantType}`);
+
+    // Save the state before destroying the plant
+    saveState(scene, "harvest", {
+      x: this.x,
+      y: this.y,
+      harvestedthis: {
+        x: this.x,
+        y: this.y,
+        plantType: this.plantType, // Save the type
+        days: this.days,
+        water: this.water,
+        sun: this.sun,
+        level: this.level, // Save the level explicitly
+      },
+    });
+    // Add plant type to harvested set
+    scene.harvestedPlantTypes.add(this.plantType);
+    console.log("Harvested Plant Types:", Array.from(scene.harvestedPlantTypes));
+
+    // Check if all plant types have been harvested
+    const allPlantTypes = ["wheat", "plum", "tomato"]; // Define all possible plant types
+    if (allPlantTypes.every((type) => scene.harvestedPlantTypes.has(type))) {
+      showCompletionPopup(scene);
+    }
+    this.destroy();
+    console.log(`${this.plantType} at (${this.x}, ${this.y}) harvested.`);
   }
 }

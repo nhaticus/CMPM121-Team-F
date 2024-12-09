@@ -134,46 +134,15 @@ class Game extends Phaser.Scene {
     // Logic to quit the game (e.g., redirect to the main menu or close the app)
   }
 
-  harvestPlant(plant) {
-    console.log(`Attempting to harvest plant with type: ${plant.plantType}`);
-
-    // Save the state before destroying the plant
-    saveState(this, "harvest", {
-      x: plant.x,
-      y: plant.y,
-      harvestedPlant: {
-        x: plant.x,
-        y: plant.y,
-        plantType: plant.plantType, // Save the type
-        days: plant.days,
-        water: plant.water,
-        sun: plant.sun,
-        level: plant.level, // Save the level explicitly
-      },
-    });
-    // Add plant type to harvested set
-    this.harvestedPlantTypes.add(plant.plantType);
-    console.log("Harvested Plant Types:", Array.from(this.harvestedPlantTypes));
-
-    // Check if all plant types have been harvested
-    const allPlantTypes = ["wheat", "plum", "tomato"]; // Define all possible plant types
-    if (allPlantTypes.every((type) => this.harvestedPlantTypes.has(type))) {
-      showCompletionPopup(this);
-    }
-    plant.destroy();
-    console.log(`${plant.plantType} at (${plant.x}, ${plant.y}) harvested.`);
-  }
-
   onPressed(content) {
-    console.log(content);
+    // console.log(content);
   }
 
   createPlant(type, frame, reqs) {
     const newPlant = [type, frame, reqs];
     this.availablePlants.push(newPlant);
-    console.log(this.availablePlants);
   }
-  
+
   checkPlantReq() {
     const surroundingTiles = [
       { x: -1, y: -1 },
@@ -254,9 +223,6 @@ class Game extends Phaser.Scene {
         plant.setFrame(13 + plant.level);
         break;
     }
-    plant.setInteractive().on("pointerdown", () => {
-      plant.showPlantInfoPopup(this);
-    });
 
     // Add plant to the group and grid
     this.plants.add(plant);
@@ -266,31 +232,6 @@ class Game extends Phaser.Scene {
     saveGameSlot(this, this.activeSaveSlot);
 
     return plant;
-  }
-
-  getPlant(x, y) {
-    return this.plantGrid.getPlant(x, y);
-  }
-
-  growPlant(x, y) {
-    const plant = this.getPlant(x, y);
-    if (plant) {
-      plant.grow();
-    }
-  }
-  waterPlant(plant) {
-    const randomWaterIncrease = Phaser.Math.Between(20, 100);
-
-    // Save the watering action
-    saveState(this, "water", {
-      x: plant.x,
-      y: plant.y,
-      previousWater: plant.water,
-      newWater: Math.min(plant.water + randomWaterIncrease, 100),
-    });
-
-    plant.water = Math.min(plant.water + randomWaterIncrease, 100);
-    console.log(`Plant watered: ${plant.water} (+${randomWaterIncrease})`);
   }
 
   update() {
