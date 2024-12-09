@@ -45,32 +45,32 @@ familiarize ourselves with the tool.
 
 ## How we Satisfied the Software Requirements
 
-# F0.a You control a character moving over a 2D grid.
+### F0.a You control a character moving over a 2D grid.
 
 We implemented a playable character that the player can control using WASD on the keyboard. The playable character has idle and moving animation for each directional idle and movement. Alongside that, there is also a 2D grid map of a farm with a plot of land the player can plant stuff.
 
-# F0.b You advance time manually in the turn-based simulation.
+### F0.b You advance time manually in the turn-based simulation.
 
 We advance the time by allowing the character to click on a house and go to sleep. When you choose to sleep, the Day value goes up by one so we advance through time by Days.
 
-# F0.c You can reap or sow plants on grid cells only when you are near them.
+### F0.c You can reap or sow plants on grid cells only when you are near them.
 
 The player is able to plant the seed when they are hovering over a tile that the player is standing and it doesn't already have a plant there. For the time being, the plants are randomly picked (from 3 choices: corn, eggplant, tomato) upon the player pressing "E".When you click on a plant a popup will show the plants stats and give you the option to harvest or water it.
 
-# F0.d Grid cells have sun and water levels. The incoming sun and water for each cell is somehow randomly generated each turn. Sun energy cannot be stored in a cell (it is used immediately or lost) while water moisture can be slowly accumulated over several turns.
+### F0.d Grid cells have sun and water levels. The incoming sun and water for each cell is somehow randomly generated each turn. Sun energy cannot be stored in a cell (it is used immediately or lost) while water moisture can be slowly accumulated over several turns.
 
 The water level thta the plant requires to level up is randomized between 25 and 100 with each day the water level will decrease by 5. The player can water each plants and increasing the water level up by 25 every time.
 
-# F0.e Each plant on the grid has a distinct type (e.g. one of 3 species) and a growth level (e.g. “level 1”, “level 2”, “level 3”).
+### F0.e Each plant on the grid has a distinct type (e.g. one of 3 species) and a growth level (e.g. “level 1”, “level 2”, “level 3”).
 
 We found some plant assets of three different plants all at different stages of growth to visually show the different levels.
 
-# F0.f Simple spatial rules govern plant growth based on sun, water, and nearby plants (growth is unlocked by satisfying conditions).
+### F0.f Simple spatial rules govern plant growth based on sun, water, and nearby plants (growth is unlocked by satisfying conditions).
 
 When you click on the plant you can see the stats of the plant (sun, water, and nearby plants).
 If these conditions are satisfied the plant will level/grow the next day/turn. The plant matures and is able to harvest at level 3.
 
-# F0.g A play scenario is completed when some condition is satisfied (e.g. at least X plants at growth level Y or above).
+### F0.g A play scenario is completed when some condition is satisfied (e.g. at least X plants at growth level Y or above).
 
 For now we have implemented so that if the player is able to grow a plant to max level and harvest it, they have achieved the goal of the game. Hopefully soon, we want to be able to get our inventory system to a functioning state and the player get to pick and choose what they want to plant and we will change the requirements for leveling to be more plant specific.
 
@@ -84,23 +84,23 @@ I also think we should change up how tasks are divided. Sometimes we will pick t
 
 ## How we Satisfied the Software Requirements
 
-# F0 Requirements.
+### F0 Requirements.
 
 Same as last week
 
-# F1.a The important state of your game's grid must be backed by a single contiguous byte array in AoS or SoA format. If your game stores the grid state in multiple format, the byte array format must be the primary format (i.e. other formats are decoded from it as needed).
+### F1.a The important state of your game's grid must be backed by a single contiguous byte array in AoS or SoA format. If your game stores the grid state in multiple format, the byte array format must be the primary format (i.e. other formats are decoded from it as needed).
 
 The primary gameplay happens on a plot of land where the player can plant seeds and interact with the plants. That being said, the data on that plot of land is recorded and kept in a simple array that can be manipulated. The array stores information on each of the plants(AoS) in it which is a structure that carries all properties of a plant. ![F1.a data structure diagram](./assets/plantGrid_diagram.png)
 
-# F1.b The player must be able to manually save their progress in the game. This must allow them to load state and continue play another day (i.e. after quitting the game app). The player must be able to manage multiple save files/slots.
+### F1.b The player must be able to manually save their progress in the game. This must allow them to load state and continue play another day (i.e. after quitting the game app). The player must be able to manage multiple save files/slots.
 
 I implemented the save functionality with the save button and the save slots with a pause button that uses a popup and there will be 3 save slots for you to choose from. Adding the ability to save across sessions was simple using the local storage I had keys stored in the browser’s localStorage updated as actions were taken to save data in the case of a sudden closing of the browser. When the program is then reinitialized we then check each key if it has any data and if it does it loads up the last saved data in the new session. I utilized the local storage saving mechanic and separated its storage ability by slots. This made it so that whatever happens/is stored in one slot has no effect on what’s going on in the other slots. Unfortunately, the plant sprites wouldn’t save after a refresh and I could not figure out how to do this
 
-# F1.c The game must implement an implicit auto-save system to support recovery from unexpected quits. (For example, when the game is launched, if an auto-save entry is present, the game might ask the player "do you want to continue where you left off?" The auto-save entry might or might not be visible among the list of manual save entries available for the player to load as part of F1.b.)
+### F1.c The game must implement an implicit auto-save system to support recovery from unexpected quits. (For example, when the game is launched, if an auto-save entry is present, the game might ask the player "do you want to continue where you left off?" The auto-save entry might or might not be visible among the list of manual save entries available for the player to load as part of F1.b.)
 
 We implemented the auto save by making the game save after planting and sleeping. The player will think there’s some autosave going on when really the game is being saved every time they do a major action.
 
-# F1.d The player must be able to undo every major choice (all the way back to the start of play), even from a saved game. They should be able to redo (undo of undo operations) multiple times.
+### F1.d The player must be able to undo every major choice (all the way back to the start of play), even from a saved game. They should be able to redo (undo of undo operations) multiple times.
 
 We implemented this using the undo and redo button. We stored all the actions in an undo or redo stack and also in memory once the action was made. If the player wanted to undo an action they would pull the action from the undo so they knew which action to undo and they’d pull the information about that action from memory so the game knew exactly how the undo should be executed. The same was done for redo. The planting of plants for some reason could not be undone. We were able to figure this out before but lost the functionality along the way. Every other action can be undone and redone though.
 
@@ -112,39 +112,39 @@ During our time working on F1 I think our plan of action really shifted. Before 
 
 ## How we Satisfied the Software Requirements
 
-# F0-1 Requirements
+### F0-1 Requirements
 
 Same as last week. No major changes were made
 
-# F2.a External DSL for scenario designs: In separate text file or text block, designers should be able to express the design of different gameplay scenarios, e.g. starting conditions, weather randomization policy, and victory conditions. The language must be able to schedule unique events that happen at specific times. (Think about how you could define a level progression by putting the details specific to each level in a separate text file or one big file describing the progression as a sequence.)
+### F2.a External DSL for scenario designs: In separate text file or text block, designers should be able to express the design of different gameplay scenarios, e.g. starting conditions, weather randomization policy, and victory conditions. The language must be able to schedule unique events that happen at specific times. (Think about how you could define a level progression by putting the details specific to each level in a separate text file or one big file describing the progression as a sequence.)
 
 There is a YAML file (externalDSL.yaml) that lays out the setup for the game, including the map, its tilesets and layers, and the player properties. The file’s content can be changed to add different layers or objects to the game(given that map.json supports it) as well as change the player’s properties.
 
-# F2.b Internal DSL for plant types and growth conditions: Within the main programming language used for the rest of your game, you should implement and use a domain-specific language for defining your different types of plants and the unique growth rules that apply to each. (Think about how you could add and remove item types from your D1 code by pushing/popping items from an array or how you could create new types of stickers at runtime in D2.)
+### F2.b Internal DSL for plant types and growth conditions: Within the main programming language used for the rest of your game, you should implement and use a domain-specific language for defining your different types of plants and the unique growth rules that apply to each. (Think about how you could add and remove item types from your D1 code by pushing/popping items from an array or how you could create new types of stickers at runtime in D2.)
 
 We implemented our internal DSL by using the same logic we used to create new stickers or add and remove items in other projects. By simply calling a function to create a new plant we can pass on the information needed to process and create a plant meeting certain requirements stated by us to grow. This allows for readability and the ability to create new plants in our array of available plants without having to program more in as long a we have the assets to provide.
 
-# F2.c Switch to an alternate platform: Change either your project's primary programming language or your primary user interface library/engine/framework. As more of your design is expressed in DSLs, your design becomes increasingly insulated from changes to your primary programming language or engine. Using your earlier implementation as a reference, it becomes more realistic that you'd be able to leverage generative AI for the large but mostly mindless translations from one language or engine to another.
+### F2.c Switch to an alternate platform: Change either your project's primary programming language or your primary user interface library/engine/framework. As more of your design is expressed in DSLs, your design becomes increasingly insulated from changes to your primary programming language or engine. Using your earlier implementation as a reference, it becomes more realistic that you'd be able to leverage generative AI for the large but mostly mindless translations from one language or engine to another.
 
-## Reflection
+### Reflection
 
 # Devlog Entry 3- [12/8/2024]
 
 ## How we Satisfied the Software Requirements
 
-# F0-2 Requirements.
+### F0-2 Requirements.
 
 Same as last week. No major changes were made
 
-# F3.a
+### F3.a
 
 We implemented the language requirement by making all the visible text a variable that can be easily changed. We have a file called localization.js in which we define the words in english but if you wanted to you could write those terms in french or spanish and set the language to french or spanish and all those variables will be updated accordingly.
 
-# F3.b
+### F3.b
 
-# F3.c
+### F3.c
 
-# F3.d
+### F3.d
 
 ## Reflection
 
