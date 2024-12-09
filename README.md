@@ -104,7 +104,7 @@ We implemented the auto save by making the game save after planting and sleeping
 
 We implemented this using the undo and redo button. We stored all the actions in an undo or redo stack and also in memory once the action was made. If the player wanted to undo an action they would pull the action from the undo so they knew which action to undo and they’d pull the information about that action from memory so the game knew exactly how the undo should be executed. The same was done for redo. The planting of plants for some reason could not be undone. We were able to figure this out before but lost the functionality along the way. Every other action can be undone and redone though.
 
-##Reflection
+## Reflection
 
 During our time working on F1 I think our plan of action really shifted. Before we each choose a task, worked on it and submitted it but here it got to the point where a task would pass through all of our desks before it was completed because someone was able to get it partially functional before getting stuck and someone else got it a little bit closer to completion and this would continue until the task was completed. We believe we made a good choice with tools and materials but I think that we should have recruited more qualified teammates. It was a lot to do for only three people. Since the player feedback thing wasn’t in the F Requirements pages, we didn’t think about it at all and only just realized it was a requirement in the first place. I think it should have been written in the F requirements pages because we spent a lot of time looking at those requirements trying to implement them and only found out about the player feedback requirement when we went to write up our dev log afterwards.
 
