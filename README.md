@@ -84,7 +84,7 @@ I also think we should change up how tasks are divided. Sometimes we will pick t
 
 ## How we Satisfied the Software Requirements
 
-#F0 Requirements.
+# F0 Requirements.
 
 Same as last week
 
@@ -112,7 +112,7 @@ During our time working on F1 I think our plan of action really shifted. Before 
 
 ## How we Satisfied the Software Requirements
 
-#F0-1 Requirements
+# F0-1 Requirements
 
 Same as last week. No major changes were made
 
@@ -126,13 +126,13 @@ We implemented our internal DSL by using the same logic we used to create new st
 
 # F2.c Switch to an alternate platform: Change either your project's primary programming language or your primary user interface library/engine/framework. As more of your design is expressed in DSLs, your design becomes increasingly insulated from changes to your primary programming language or engine. Using your earlier implementation as a reference, it becomes more realistic that you'd be able to leverage generative AI for the large but mostly mindless translations from one language or engine to another.
 
-##Reflection
+## Reflection
 
 # Devlog Entry 3- [12/8/2024]
 
 ## How we Satisfied the Software Requirements
 
-#F0-2 Requirements.
+# F0-2 Requirements.
 
 Same as last week. No major changes were made
 
@@ -146,6 +146,6 @@ We implemented the language requirement by making all the visible text a variabl
 
 # F3.d
 
-##Reflection
+## Reflection
 
 I think if we had actually successfully implemented it into a mobile game we would have had to go back and change the controls to match. Right now the game works with clicks and key presses and when on mobile, the game doesn’t function at all because of those limits. We believe we made a good choice with tools and materials but I think that we should have recruited more qualified teammates. It was a lot to do for only three people. The game didn’t evolve much because we didn’t complete F3 but we did add a lot more popups for player feedback purposes as the game progressed.
