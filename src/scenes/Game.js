@@ -124,8 +124,8 @@ class Game extends Phaser.Scene {
 
     //create plants with different requirements (Must have frame in order in spritesheets);
     this.createPlant("wheat", 1, ["sun", "water", "neighbor"]);
-    this.createPlant("plum", 7, ["sun", "neighbor"]);
-    this.createPlant("tomato", 13, ["water"]);
+    this.createPlant("plum", 7, ["water", "neighbor"]);
+    this.createPlant("tomato", 13, ["neighbor"]);
   }
 
   // Quit Game
