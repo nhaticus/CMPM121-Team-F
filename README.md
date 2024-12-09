@@ -41,7 +41,7 @@ We think that switching platforms or languages mid-way through the project could
 By using Phaser as a game library, we are hoping to create something fun and unique as well a
 familiarize ourselves with the tool.
 
-# Devlog Entry - [11/29/2024]
+# Devlog Entry 0 - [11/29/2024]
 
 ## How we Satisfied the Software Requirements
 
@@ -79,3 +79,78 @@ For now we have implemented so that if the player is able to grow a plant to max
 We thought a lot in advance about making this assignment as easy as possible to manipulate given the changing requirements. It's a big reason we went with JavaScript and Phaser. We implemented Tiled into the idea because it came with a built in grid system for us to just borrow from, however at first we had forgotten how to use Tiled. It took a while to get into the swing of things again but I don't think we need to change anything.
 If we were to change something I would say that the assets we used in Tiled are so pretty and detailed that I think it made us focus on things that we really didn't need to focus on immediately. For example, we have a functional walking and idle animation working which was something we didn't need for the requirements but it was something we got distracted by because it was there. I think if we were going to change something it would be our scope so that we hone in more on what's required rather than additional features.
 I also think we should change up how tasks are divided. Sometimes we will pick tasks at random only to find out that one of us can't do any of our tasks right away because our task depends on someone else in the group completing their task first. We should think through how we organize our team effort a little more, but as for the environment and tools we're working with, we have gotten a lot more comfortable with them now.
+
+
+# Devlog Entry 1- [12/8/2024]
+
+## How we Satisfied the Software Requirements
+
+#F0 Requirements. 
+
+Same as last week
+
+# F1.a The important state of your game's grid must be backed by a single contiguous byte array in AoS or SoA format. If your game stores the grid state in multiple format, the byte array format must be the primary format (i.e. other formats are decoded from it as needed).
+
+The primary gameplay happens on a plot of land where the player can plant seeds and interact with the plants. That being said, the data on that plot of land is recorded and kept in a simple array that can be manipulated. The array stores information on each of the plants(AoS) in it which is a structure that carries all properties of a plant. "![F1.a data structure diagram](./assets/plantGrid_diagram.png)"
+
+ # F1.b The player must be able to manually save their progress in the game. This must allow them to load state and continue play another day (i.e. after quitting the game app). The player must be able to manage multiple save files/slots.
+
+I implemented the save functionality with the save button and the save slots with a pause button that uses a popup and there will be 3 save slots for you to choose from. Adding the ability to save across sessions was simple using the local storage I had keys stored in the browser’s localStorage updated as actions were taken to save data in the case of a sudden closing of the browser. When the program is then reinitialized we then check each key if it has any data and if it does it loads up the last saved data in the new session.  I utilized the local storage saving mechanic and separated its storage ability by slots. This made it so that whatever happens/is stored in one slot has no effect on what’s going on in the other slots. Unfortunately, the plant sprites wouldn’t save after a refresh and I could not figure out how to do this
+
+# F1.c The game must implement an implicit auto-save system to support recovery from unexpected quits. (For example, when the game is launched, if an auto-save entry is present, the game might ask the player "do you want to continue where you left off?" The auto-save entry might or might not be visible among the list of manual save entries available for the player to load as part of F1.b.)
+
+We implemented the auto save by making the game save after planting and sleeping. The player will think there’s some autosave going on when really the game is being saved every time they do a major action.
+
+# F1.d The player must be able to undo every major choice (all the way back to the start of play), even from a saved game. They should be able to redo (undo of undo operations) multiple times.
+
+We implemented this using the undo and redo button. We stored all the actions in an undo or redo stack and also in memory once the action was made. If the player wanted to undo an action they would pull the action from the undo so they knew which action to undo and they’d pull the information about that action from memory so the game knew exactly how the undo should be executed. The same was done for redo. The planting of plants for some reason could not be undone. We were able to figure this out before but lost the functionality along the way. Every other action can be undone and redone though.
+
+##Reflection 
+
+During our time working on F1 I think our plan of action really shifted. Before we each choose a task, worked on it and submitted it but here it got to the point where a task would pass through all of our desks before it was completed because someone was able to get it partially functional before getting stuck and someone else got it a little bit closer to completion and this would continue until the task was completed. We believe we made a good choice with tools and materials but I think that we should have recruited more qualified teammates. It was a lot to do for only three people. Since the player feedback thing wasn’t in the F Requirements pages, we didn’t think about it at all and only just realized it was a requirement in the first place. I think it should have been written in the F requirements pages because we spent a lot of time looking at those requirements trying to implement them and only found out about the player feedback requirement when we went to write up our dev log afterwards.
+
+
+# Devlog Entry 2- [12/8/2024]
+
+## How we Satisfied the Software Requirements
+
+#F0-1 Requirements
+
+Same as last week. No major changes were made
+
+# F2.a External DSL for scenario designs: In separate text file or text block, designers should be able to express the design of different gameplay scenarios, e.g. starting conditions, weather randomization policy, and victory conditions. The language must be able to schedule unique events that happen at specific times. (Think about how you could define a level progression by putting the details specific to each level in a separate text file or one big file describing the progression as a sequence.)
+
+There is a YAML file (externalDSL.yaml) that lays out the setup for the game, including the map, its tilesets and layers, and the player properties. The file’s content can be changed to add different layers or objects to the game(given that map.json supports it) as well as change the player’s properties.
+
+# F2.b Internal DSL for plant types and growth conditions: Within the main programming language used for the rest of your game, you should implement and use a domain-specific language for defining your different types of plants and the unique growth rules that apply to each. (Think about how you could add and remove item types from your D1 code by pushing/popping items from an array or how you could create new types of stickers at runtime in D2.)
+
+We implemented our internal DSL by using the same logic we used to create new stickers or add and remove items in other projects. By simply calling a function to create a new plant we can pass on the information needed to process and create a plant meeting certain requirements stated by us to grow. This allows for readability and the ability to create new plants in our array of available plants without having to program more in as long a we have the assets to provide.
+
+# F2.c Switch to an alternate platform: Change either your project's primary programming language or your primary user interface library/engine/framework. As more of your design is expressed in DSLs, your design becomes increasingly insulated from changes to your primary programming language or engine. Using your earlier implementation as a reference, it becomes more realistic that you'd be able to leverage generative AI for the large but mostly mindless translations from one language or engine to another.
+
+
+##Reflection 
+
+
+
+# Devlog Entry 3- [12/8/2024]
+
+## How we Satisfied the Software Requirements
+
+#F0-2 Requirements.
+
+Same as last week. No major changes were made
+
+# F3.a
+
+We implemented the language requirement by making all the visible text a variable that can be easily changed. We have a file called localization.js in which we define the words in english but if you wanted to you could write those terms in french or spanish and set the language to french or spanish and all those variables will be updated accordingly.
+
+# F3.b
+
+# F3.c
+
+# F3.d
+
+##Reflection 
+
+I think if we had actually successfully implemented it into a mobile game we would have had to go back and change the controls to match. Right now the game works with clicks and key presses and when on mobile, the game doesn’t function at all because of those limits. We believe we made a good choice with tools and materials but I think that we should have recruited more qualified teammates. It was a lot to do for only three people. The game didn’t evolve much because we didn’t complete F3 but we did add a lot more popups for player feedback purposes as the game progressed.
