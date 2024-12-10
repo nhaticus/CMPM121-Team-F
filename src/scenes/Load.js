@@ -20,7 +20,7 @@ class Load extends Phaser.Scene {
     /* button assets */
     this.load.image("UndoButton", "tilesets/UndoButton.png");
     this.load.image("RedoButton", "tilesets/RedoButton.png");
-    this.load.image("SaveButton", "tilesets/save.png");
+    this.load.image("SaveButton", "tilesets/Save.png");
     this.load.image("RestartButton", "tilesets/RestartButton.png");
     this.load.image("PauseButton", "tilesets/PauseButton.png");
 
