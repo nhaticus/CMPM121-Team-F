@@ -128,6 +128,11 @@ class Game extends Phaser.Scene {
     this.createPlant("tomato", 13, ["neighbor"]);
   }
 
+  createPlant(type, frame, reqs) {
+    const newPlant = [type, frame, reqs];
+    this.availablePlants.push(newPlant);
+  }
+
   // Quit Game
   quitGame() {
     console.log("Game exited");
@@ -136,11 +141,6 @@ class Game extends Phaser.Scene {
 
   onPressed(content) {
     // console.log(content);
-  }
-
-  createPlant(type, frame, reqs) {
-    const newPlant = [type, frame, reqs];
-    this.availablePlants.push(newPlant);
   }
 
   checkPlantReq() {
