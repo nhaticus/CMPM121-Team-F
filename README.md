@@ -128,6 +128,8 @@ We implemented our internal DSL by using the same logic we used to create new st
 
 ### Reflection
 
+For the most part, our F2 went smoothly aside from part C where we had to make a platform change. Initially we thought that this process wouldn't be too difficult as we wanted to switch from JavaScript to TypeScript and they are very similar in nature. However, we were very wrong as our files have gotten too long and the process of splitting the main file caused multiple problems and we just couldn't figure it out. Given that we were warned to becareful with how we should code for the platform change, our codes weren't independent of each others enough to have a smooth transition. For the future, we will make sure to keep codes more organized and have stricter guidelines for code clarity.
+
 # Devlog Entry 3- [12/8/2024]
 
 ## How we Satisfied the Software Requirements
@@ -149,5 +151,3 @@ We implemented the language requirement by making all the visible text a variabl
 ## Reflection
 
 I think if we had actually successfully implemented it into a mobile game we would have had to go back and change the controls to match. Right now the game works with clicks and key presses and when on mobile, the game doesn’t function at all because of those limits. We believe we made a good choice with tools and materials but I think that we should have recruited more qualified teammates. It was a lot to do for only three people. The game didn’t evolve much because we didn’t complete F3 but we did add a lot more popups for player feedback purposes as the game progressed.
-
-
